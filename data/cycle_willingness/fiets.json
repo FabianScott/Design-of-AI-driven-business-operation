@@ -1,0 +1,14 @@
+{
+    "Train - NS": [-8.147, 3.304],
+    "Train - Local": [-6.806, 3.032],
+    "Bus": [-5.744, 2.633],
+    "Tram": [-6.007, 2.712],
+    "Metro": [-6.172, 2.843],
+    "City Center": [-5.573, 2.451],
+    "Big Shopping Centers": [-5.344, 2.403],
+    "Small Grocery Shops": [-4.564, 2.307],
+    "Elementary Schools": [-5.637, 2.772],
+    "High Schools": [-6.622, 2.343],
+    "Universities": [-6.990, 2.779]
+}
+  
