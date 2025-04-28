@@ -4,3 +4,4 @@ geopandas
 numpy
 matplotlib
 openpyxl
+scikit-learn
