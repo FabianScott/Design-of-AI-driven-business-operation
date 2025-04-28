@@ -25,6 +25,6 @@ def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', sh
     plt.ylabel('True')
     
     if save_path:
-        plt.savefig(save_path, bbox_inches='tight')
+        plt.savefig(save_path, bbox_inches='tight', dpi=300)
     if show:
         plt.show()
