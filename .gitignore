@@ -1,3 +1,4 @@
 data/*
 !data/cycle_willingness/
 !data/demographics/
+*.pyc
