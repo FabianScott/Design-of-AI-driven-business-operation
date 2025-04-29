@@ -1,6 +1,7 @@
 import pandas as pd
 from codebase.load_data.load_demographics import load_demograhics
 from .willingness import willingness_to_cycle
+from codebase.load_data.load_buurt import load_buurt_data
 
 demographics_population_column = "a_inw"
 demographics_buurt_code_column = "gwb_code"
@@ -8,20 +9,21 @@ punt_travel_time_column = 'reistijd_min'
 punt_buurt_code_column = 'bu_code'
 willingness_to_cycle_column = 'willingness_to_cycle_percentage'
 
+
 # Helper functions:
-def filter_by_time(df: pd.DataFrame, max_time):
+def filter_by_time(df: pd.DataFrame, max_time) -> pd.DataFrame:
     """Filters by travel time and removes duplicates based on bu_code, keeping the smallest value."""
-    df_filtered = df[df['reistijd_min'] <= max_time]
-    df_filtered = df_filtered.sort_values(by='reistijd_min', ascending=True, )
+    df_filtered: pd.DataFrame = df[df[punt_travel_time_column] <= max_time]
+    df_filtered = df_filtered.sort_values(by=punt_travel_time_column, ascending=True, )
     df_filtered[punt_buurt_code_column] = df_filtered[punt_buurt_code_column].astype(str)
     df_filtered = df_filtered.drop_duplicates(subset=['bu_code'], keep='first', )
     return df_filtered
 
-def get_buurt_ids(df: pd.DataFrame):
+def get_buurt_ids(df: pd.DataFrame) -> list:
     df_buurt = df[[punt_buurt_code_column]].astype(str)
     return df_buurt.values.flatten().tolist()
 
-def add_willingness_to_cycle_column(df: pd.DataFrame, location: str, mode="fiets"):
+def add_willingness_to_cycle_column(df: pd.DataFrame, location: str, mode="fiets") -> pd.DataFrame:
     willingness_array = willingness_to_cycle(df[punt_travel_time_column], location, mode=mode)
     df_filtered = df.copy()
     df_filtered[willingness_to_cycle_column] = willingness_array
@@ -77,9 +79,9 @@ def get_total_inhabitants_and_willingness(punt1, mode, within_mins, location="El
         total_inhabitants (int): The total number of inhabitants within the specified time.
         total_willing_cyclists (int): The total number of willing cyclists within the specified time.
     """
-    punt2 = "buurt"
+
     df_demographics = load_demograhics()
-    df_punt = pd.read_csv(f"data/02_punt_tot_punt_analyse/{punt1}_naar_{punt2}_{mode}.csv", sep=";")
+    df_punt = load_buurt_data(punt1, mode=mode)
     nl_total = df_demographics[demographics_population_column][0]
     
     total_inhabitants = get_total_inhabitants_in_buurts(df_punt, within_mins=within_mins, df_demographics=df_demographics)
@@ -92,7 +94,7 @@ def get_total_inhabitants_and_willingness(punt1, mode, within_mins, location="El
         )
     
     if verbose:
-        print(f"Total inhabitants within {within_mins} minutes of {punt1} from {punt2}: {total_inhabitants} of {nl_total} = {total_inhabitants/nl_total:.2%} of the Netherlands")
+        print(f"Total inhabitants within {within_mins} minutes of {punt1} from buurt: {total_inhabitants} of {nl_total} = {total_inhabitants/nl_total:.2%} of the Netherlands")
         print(f"Total willingness to cycle of those: {total_willing_cyclists} of {total_inhabitants} = {total_willing_cyclists/total_inhabitants:.2%}")
     
     return total_inhabitants, total_willing_cyclists
