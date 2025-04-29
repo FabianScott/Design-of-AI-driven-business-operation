@@ -36,7 +36,7 @@ def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', sh
         plt.show()
 
 
-def plot_willingness_heatmap(punt2, mode, location, show=True, savename=None, cmap='viridis'):
+def plot_willingness_by_buurt_heatmap(punt2, mode, location, show=True, savename=None, cmap='viridis'):
     df_punt = load_buurt_data(punt2, mode=mode,)
     gdf = gpd.read_file("data/WijkBuurtkaart_2023_v2/wijkenbuurten_2023_v2.gpkg", layer="buurten")
     # Remove the empty buurts

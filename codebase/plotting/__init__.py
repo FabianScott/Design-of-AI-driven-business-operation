@@ -1,1 +1,1 @@
-from .plots import plot_confusion_matrix, plot_willingness_heatmap
+from .plots import plot_confusion_matrix, plot_willingness_by_buurt_heatmap
