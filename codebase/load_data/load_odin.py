@@ -1,8 +1,7 @@
 import os
 import pandas as pd
 
-from .load_demographics import load_excel
-
+from codebase.load_data.load_demographics import load_excel
 
 
 def make_ml_dataset(df, target_col, drop_cols, categorical_cols, target_val=None, test_size=0.2, random_state=42):
@@ -31,7 +30,7 @@ def load_odin_as_ml_dataset(
         validation_proportion=None,
         random_state=42,
 ):
-    odin_excel_path = os.path.join(os.getcwd(), "data", "OdiN 2019-2023", f"OdiN {year}", f"ODiN{year}_Databestand.csv")
+    odin_excel_path = os.path.join(os.getcwd(), "data", "OdiN 2019-2023", f"OdiN {year}", f"ODiN{year}_Databestand.xlsx")
     df = load_excel(odin_excel_path)
 
     moving_cols = [
