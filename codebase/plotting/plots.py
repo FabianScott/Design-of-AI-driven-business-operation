@@ -10,7 +10,7 @@ from codebase.buurt_calculations import filter_by_time, willingness_to_cycle, pu
 from codebase.load_data.column_names import distance_col
 
 
-def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', show=True, save_path=None):
+def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', show=True, savename=None):
     """
     Plots a confusion matrix using matplotlib and seaborn.
 
@@ -32,8 +32,8 @@ def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', sh
     plt.xlabel('Predicted')
     plt.ylabel('True')
     
-    if save_path:
-        plt.savefig(save_path, bbox_inches='tight', dpi=300)
+    if savename:
+        plt.savefig(savename, bbox_inches='tight', dpi=300)
     if show:
         plt.show()
 
