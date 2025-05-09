@@ -8,7 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
 
 from codebase.load_data.load_odin import make_ml_dataset
-from codebase.load_data.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_motive, transport_modes
+from codebase.load_data.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_destination, filter_by_motive, transport_modes
 from codebase.load_data.column_names import transport_mode_col, distance_col
 from codebase.plotting.plots import plot_binary_regression
 
@@ -20,6 +20,7 @@ def run_binary_regression(
         max_dist=np.inf, 
         origins=None, 
         destinations=None,
+        location_level=0,
         motives=None,
         additional_features=None,
         plot=True, 
@@ -47,6 +48,8 @@ def run_binary_regression(
     destinations : list, optional
         A list of destinations to filter the data. Default is None.
         If None, no filtering is applied.
+    location_level : int, optional
+        0: Buurt, 1: Gemeente, 2: Provincie. Default is 0.
     motives : list, optional
         A list of motives to filter the data. Default is None.
         If None, no filtering is applied.
@@ -71,8 +74,8 @@ def run_binary_regression(
             The predicted probabilities for the test set.
     """
     df_filtered = filter_by_distance_and_duration(df, 0, max_dist, 0, np.inf)
-    df_filtered = filter_by_origin(df_filtered, origins) if origins else df_filtered
-    df_filtered = filter_by_origin(df_filtered, destinations) if destinations else df_filtered
+    df_filtered = filter_by_origin(df_filtered, origins, level=location_level) if origins else df_filtered
+    df_filtered = filter_by_destination(df_filtered, destinations, level=location_level) if destinations else df_filtered
     df_filtered = filter_by_motive(df_filtered, motives) if motives else df_filtered
 
     X_train, X_test, y_train, y_test = make_ml_dataset(

@@ -1,4 +1,5 @@
 import pandas as pd
+from codebase.load_data.column_names import transport_mode_col, distance_col
 
 # KHvm
 transport_modes = {
@@ -21,6 +22,12 @@ trip_motives = {
     7: "Other social/recreational",
     8: "Touring/walking",
     9: "Other motive"
+}
+
+level_mapping_suffix = {
+    0: "PC",
+    1: "Gem",
+    2: "Prov"
 }
 
 def filter_by_mode_and_category(df: pd.DataFrame, mode, category):
@@ -46,18 +53,26 @@ def filter_by_distance_and_duration(df: pd.DataFrame, min_distance, max_distance
                      (df["Reisduur"] >= min_duration) & (df["Reisduur"] <= max_duration)]
     return filtered_df
 
-def filter_by_origin(df: pd.DataFrame, origins):
+def filter_by_origin(df: pd.DataFrame, origins, level=0):
     """
     Filter the dataframe by origin.
+    Level is 0 (Buurt), 1 (Geemente), 2 (Province)
     """
-    filtered_df = df[df["VertPC"].isin(origins)]
+    if level not in level_mapping_suffix.keys():
+        raise ValueError(f"Invalid level: {level}. Valid levels are: {list(level_mapping_suffix.keys())}")
+    
+    filtered_df = df[df["Vert" + level_mapping_suffix[level]].isin(origins)]
     return filtered_df
     
-def filter_by_destination(df: pd.DataFrame, destinations):
+def filter_by_destination(df: pd.DataFrame, destinations, level=0):
     """
     Filter the dataframe by destination.
+    Level is 0 (Buurt), 1 (Geemente), 2 (Province)
     """
-    filtered_df = df[df["AankPC"].isin(destinations)]
+    if level not in level_mapping_suffix.keys():
+        raise ValueError(f"Invalid level: {level}. Valid levels are: {list(level_mapping_suffix.keys())}")
+    
+    filtered_df = df[df["Aank" + level_mapping_suffix[level]].isin(destinations)]
     return filtered_df
 
 def filter_by_motive(df: pd.DataFrame, motives):
