@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
-from scipy.stats import binned_statistic
 
 from codebase.load_data.load_odin import make_ml_dataset
 from codebase.load_data.filters import filter_by_distance_and_duration, filter_by_origin, transport_modes
+from codebase.load_data.column_names import transport_mode_col, distance_col
+from codebase.plotting.plots import plot_binary_regression
 
 
 def run_binary_regression(df: pd.DataFrame, transport_mode=5, test_size=0.02, max_dist=np.inf, origins=None, destinations=None, plot=True, savename=None) -> tuple:
@@ -56,9 +57,9 @@ def run_binary_regression(df: pd.DataFrame, transport_mode=5, test_size=0.02, ma
 
     X_train, X_test, y_train, y_test = make_ml_dataset(
         df_filtered,
-        target_col="KHvm",
+        target_col=transport_mode_col,
         target_val=transport_mode,  # see load_data/filters.py for KHvm value dictionary
-        drop_cols=[col for col in df.columns if col not in ["KHvm", "AfstV"]],
+        drop_cols=[col for col in df.columns if col not in [transport_mode_col, distance_col]],
         categorical_cols=None,
         test_size=test_size
         )
@@ -71,30 +72,6 @@ def run_binary_regression(df: pd.DataFrame, transport_mode=5, test_size=0.02, ma
     y_pred = pipeline.predict_proba(X_test)[:, 1]  # Get the probability of cycling
 
     if plot:
-        # Bin settings
-        bins = 50
-
-        # Compute average actual cycling per bin
-        bin_means, bin_edges, _ = binned_statistic(X_test.values.flatten(), y_test.values.flatten(), statistic='mean', bins=bins)
-        bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
-
-        # Plot predicted and actual
-        plt.figure(figsize=(10, 6))
-        plt.scatter(X_test, y_pred, label="Predicted probability", alpha=0.5, color="orange", s=10)
-        plt.scatter(X_test, y_test, label="Actual binary value", alpha=0.5, color="blue", s=10)
-        plt.plot(bin_centers, bin_means, label=f"Actual {transport_modes[transport_mode]} rate (binned)", color="green", linewidth=2)
-
-        # add the histogram of the actual values
-        plt.xlabel("Distance (100m)")
-        plt.ylabel(f"Predicted probability of {transport_modes[transport_mode]}")
-        plt.title(f"Predicted probability of {transport_modes[transport_mode]} by distance")
-        plt.legend()
-        plt.grid()
-        plt.tight_layout()
-
-        if savename:
-            os.makedirs(os.path.dirname(savename), exist_ok=True)
-            plt.savefig(savename, dpi=300)
-        plt.show()
+        plot_binary_regression(X_test, y_test, y_pred, transport_modes[transport_mode], savename=savename)
 
     return pipeline, (X_train, X_test, y_test, y_pred)

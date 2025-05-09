@@ -2,12 +2,13 @@ import pandas as pd
 from codebase.load_data.load_demographics import load_demograhics
 from .willingness import willingness_to_cycle
 from codebase.load_data.load_buurt import load_buurt_data
-
-demographics_population_column = "a_inw"
-demographics_buurt_code_column = "gwb_code"
-punt_travel_time_column = 'reistijd_min'
-punt_buurt_code_column = 'bu_code'
-willingness_to_cycle_column = 'willingness_to_cycle_percentage'
+from codebase.load_data.column_names import (
+    demographics_population_column,
+    demographics_buurt_code_column,
+    punt_travel_time_column,
+    punt_buurt_code_column,
+    willingness_to_cycle_column,
+)
 
 
 # Helper functions:

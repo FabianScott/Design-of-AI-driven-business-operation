@@ -3,9 +3,11 @@ import numpy as np
 import seaborn as sns
 import geopandas as gpd
 import matplotlib.pyplot as plt
+from scipy.stats import binned_statistic
 
 from codebase.load_data import load_buurt_data
 from codebase.buurt_calculations import filter_by_time, willingness_to_cycle, punt_travel_time_column
+from codebase.load_data.column_names import distance_col
 
 
 def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', show=True, save_path=None):
@@ -62,3 +64,30 @@ def plot_willingness_by_buurt_heatmap(punt2, mode, location, show=True, savename
         plt.savefig(savename, bbox_inches='tight', dpi=300)
     if show:
         plt.show()
+
+def plot_binary_regression(X_test, y_test, y_pred, transport_mode_str, savename=None):
+    # Bin settings
+    bins = 50
+
+    # Compute average actual cycling per bin
+    bin_means, bin_edges, _ = binned_statistic(X_test[distance_col].values.flatten(), y_test.values.flatten(), statistic='mean', bins=bins)
+    bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
+
+    # Plot predicted and actual
+    plt.figure(figsize=(10, 6))
+    plt.scatter(X_test[distance_col], y_pred, label="Predicted probability", alpha=0.5, color="orange", s=10)
+    plt.scatter(X_test[distance_col], y_test, label="Actual binary value", alpha=0.5, color="blue", s=10)
+    plt.plot(bin_centers, bin_means, label=f"Actual {transport_mode_str} rate (binned)", color="green", linewidth=2)
+
+    # add the histogram of the actual values
+    plt.xlabel("Distance (100m)")
+    plt.ylabel(f"Predicted probability of {transport_mode_str}")
+    plt.title(f"Predicted probability of {transport_mode_str} by distance")
+    plt.legend()
+    plt.grid()
+    plt.tight_layout()
+
+    if savename:
+        os.makedirs(os.path.dirname(savename), exist_ok=True)
+        plt.savefig(savename, dpi=300)
+    plt.show()
