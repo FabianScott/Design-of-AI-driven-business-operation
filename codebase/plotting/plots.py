@@ -65,7 +65,7 @@ def plot_willingness_by_buurt_heatmap(punt2, mode, location, show=True, savename
     if show:
         plt.show()
 
-def plot_binary_regression(X_test, y_test, y_pred, transport_mode_str, savename=None):
+def plot_binary_regression(X_test, y_test, y_pred, transport_mode_str, destinations, savename=None):
     # Bin settings
     bins = 50
 
@@ -82,7 +82,7 @@ def plot_binary_regression(X_test, y_test, y_pred, transport_mode_str, savename=
     # add the histogram of the actual values
     plt.xlabel("Distance (100m)")
     plt.ylabel(f"Predicted probability of {transport_mode_str}")
-    plt.title(f"Predicted probability of {transport_mode_str} by distance")
+    plt.title(f"Predicted probability of {transport_mode_str} by distance to {destinations}")
     plt.legend()
     plt.grid()
     plt.tight_layout()

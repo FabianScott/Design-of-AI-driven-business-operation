@@ -11,7 +11,7 @@ transport_modes = {
     7: "Other"
 }
 # KMotiefV
-trip_categories = {
+trip_motives = {
     1: "Work",      # Commute to/from work
     2: "Business",  # Business visit (work-related)
     3: "Services/personal care",
@@ -30,8 +30,8 @@ def filter_by_mode_and_category(df: pd.DataFrame, mode, category):
     # Check if the mode and category are valid
     if mode not in transport_modes.keys():
         raise ValueError(f"Invalid transport mode: {mode}. Valid modes are: {list(transport_modes.keys())}")
-    if category not in trip_categories.keys():
-        raise ValueError(f"Invalid trip category: {category}. Valid categories are: {list(trip_categories.keys())}")
+    if category not in trip_motives.keys():
+        raise ValueError(f"Invalid trip category: {category}. Valid categories are: {list(trip_motives.keys())}")
 
     filtered_df = df[(df["KHvm"] == mode) & (df["KMotiefV"] == category)]
     return filtered_df
@@ -58,4 +58,11 @@ def filter_by_destination(df: pd.DataFrame, destinations):
     Filter the dataframe by destination.
     """
     filtered_df = df[df["AankPC"].isin(destinations)]
+    return filtered_df
+
+def filter_by_motive(df: pd.DataFrame, motives):
+    """
+    Filter the dataframe by motive.
+    """
+    filtered_df = df[df["KMotiefV"].isin(motives)]
     return filtered_df

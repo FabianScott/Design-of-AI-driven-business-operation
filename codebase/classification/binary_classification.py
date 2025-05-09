@@ -8,12 +8,23 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
 
 from codebase.load_data.load_odin import make_ml_dataset
-from codebase.load_data.filters import filter_by_distance_and_duration, filter_by_origin, transport_modes
+from codebase.load_data.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_motive, transport_modes
 from codebase.load_data.column_names import transport_mode_col, distance_col
 from codebase.plotting.plots import plot_binary_regression
 
 
-def run_binary_regression(df: pd.DataFrame, transport_mode=5, test_size=0.02, max_dist=np.inf, origins=None, destinations=None, plot=True, savename=None) -> tuple:
+def run_binary_regression(
+        df: pd.DataFrame, 
+        transport_mode=5, 
+        test_size=0.02, 
+        max_dist=np.inf, 
+        origins=None, 
+        destinations=None,
+        motives=None,
+        additional_features=None,
+        plot=True, 
+        savename=None
+        ) -> tuple:
     """
 
     Run a binary regression on the dataset to predict the probability of specific mode based on distance.
@@ -33,6 +44,14 @@ def run_binary_regression(df: pd.DataFrame, transport_mode=5, test_size=0.02, ma
     origins : list, optional
         A list of origins to filter the data. Default is None.
         If None, no filtering is applied.
+    destinations : list, optional
+        A list of destinations to filter the data. Default is None.
+        If None, no filtering is applied.
+    motives : list, optional
+        A list of motives to filter the data. Default is None.
+        If None, no filtering is applied.
+    additional_features : list, optional
+        A list of additional features to include in the model. Default is None.
     plot : bool, optional
         Whether to plot the predicted probabilities against the actual values. Default is True.
     savename : str, optional
@@ -54,12 +73,13 @@ def run_binary_regression(df: pd.DataFrame, transport_mode=5, test_size=0.02, ma
     df_filtered = filter_by_distance_and_duration(df, 0, max_dist, 0, np.inf)
     df_filtered = filter_by_origin(df_filtered, origins) if origins else df_filtered
     df_filtered = filter_by_origin(df_filtered, destinations) if destinations else df_filtered
+    df_filtered = filter_by_motive(df_filtered, motives) if motives else df_filtered
 
     X_train, X_test, y_train, y_test = make_ml_dataset(
         df_filtered,
         target_col=transport_mode_col,
         target_val=transport_mode,  # see load_data/filters.py for KHvm value dictionary
-        drop_cols=[col for col in df.columns if col not in [transport_mode_col, distance_col]],
+        drop_cols=[col for col in df.columns if col not in [transport_mode_col, distance_col] + (additional_features if additional_features is not None else [])],
         categorical_cols=None,
         test_size=test_size
         )
@@ -72,6 +92,6 @@ def run_binary_regression(df: pd.DataFrame, transport_mode=5, test_size=0.02, ma
     y_pred = pipeline.predict_proba(X_test)[:, 1]  # Get the probability of cycling
 
     if plot:
-        plot_binary_regression(X_test, y_test, y_pred, transport_modes[transport_mode], savename=savename)
+        plot_binary_regression(X_test, y_test, y_pred, transport_modes[transport_mode], motives, savename=savename)
 
     return pipeline, (X_train, X_test, y_test, y_pred)
