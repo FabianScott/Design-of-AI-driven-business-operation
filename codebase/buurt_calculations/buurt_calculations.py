@@ -1,8 +1,8 @@
 import pandas as pd
-from codebase.load_data.load_demographics import load_demograhics
+from codebase.data.load_demographics import load_demograhics
 from .willingness import willingness_to_cycle
-from codebase.load_data.load_buurt import load_buurt_data
-from codebase.load_data.column_names import (
+from codebase.data.load_buurt import load_buurt_data
+from codebase.data.column_names import (
     demographics_population_column,
     demographics_buurt_code_column,
     punt_travel_time_column,

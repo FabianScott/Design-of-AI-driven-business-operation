@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from codebase.load_data.load_demographics import load_excel
+from codebase.data.load_demographics import load_excel
 
 
 def make_ml_dataset(df, target_col, drop_cols, categorical_cols=None, target_val=None, test_size=0.2, random_state=42, stratification_col=None) -> tuple:

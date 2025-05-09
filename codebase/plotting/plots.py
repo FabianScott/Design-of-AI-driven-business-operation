@@ -5,9 +5,9 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 from scipy.stats import binned_statistic
 
-from codebase.load_data import load_buurt_data
+from codebase.data import load_buurt_data
 from codebase.buurt_calculations import filter_by_time, willingness_to_cycle, punt_travel_time_column
-from codebase.load_data.column_names import distance_col
+from codebase.data.column_names import distance_col
 
 
 def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', show=True, savename=None):
@@ -33,6 +33,7 @@ def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', sh
     plt.ylabel('True')
     
     if savename:
+        os.makedirs(os.path.dirname(savename), exist_ok=True)
         plt.savefig(savename, bbox_inches='tight', dpi=300)
     if show:
         plt.show()

@@ -1,34 +1,6 @@
 import pandas as pd
-from codebase.load_data.column_names import transport_mode_col, distance_col
-
-# KHvm
-transport_modes = {
-    1: "Car - driver",
-    2: "Car - passenger",
-    3: "Train",
-    4: "Bus/tram/metro",
-    5: "Bicycle",
-    6: "On foot",
-    7: "Other"
-}
-# KMotiefV
-trip_motives = {
-    1: "Work",      # Commute to/from work
-    2: "Business",  # Business visit (work-related)
-    3: "Services/personal care",
-    4: "Shopping",  # Groceries
-    5: "Education", # Course
-    6: "Visit/stay overnight",
-    7: "Other social/recreational",
-    8: "Touring/walking",
-    9: "Other motive"
-}
-
-level_mapping_suffix = {
-    0: "PC",
-    1: "Gem",
-    2: "Prov"
-}
+from codebase.data.column_names import transport_mode_col, distance_col
+from codebase.data.codebook_dicts import transport_modes, trip_motives, level_mapping_suffix
 
 def filter_by_mode_and_category(df: pd.DataFrame, mode, category):
     """
