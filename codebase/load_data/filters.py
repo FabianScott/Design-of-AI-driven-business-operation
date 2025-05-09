@@ -1,0 +1,61 @@
+import pandas as pd
+
+# KHvm
+transport_modes = {
+    1: "Car - driver",
+    2: "Car - passenger",
+    3: "Train",
+    4: "Bus/tram/metro",
+    5: "Bicycle",
+    6: "On foot",
+    7: "Other"
+}
+# KMotiefV
+trip_categories = {
+    1: "Work",      # Commute to/from work
+    2: "Business",  # Business visit (work-related)
+    3: "Services/personal care",
+    4: "Shopping",  # Groceries
+    5: "Education", # Course
+    6: "Visit/stay overnight",
+    7: "Other social/recreational",
+    8: "Touring/walking",
+    9: "Other motive"
+}
+
+def filter_by_mode_and_category(df: pd.DataFrame, mode, category):
+    """
+    Filter the dataframe by transport mode and trip category.
+    """
+    # Check if the mode and category are valid
+    if mode not in transport_modes.keys():
+        raise ValueError(f"Invalid transport mode: {mode}. Valid modes are: {list(transport_modes.keys())}")
+    if category not in trip_categories.keys():
+        raise ValueError(f"Invalid trip category: {category}. Valid categories are: {list(trip_categories.keys())}")
+
+    filtered_df = df[(df["KHvm"] == mode) & (df["KMotiefV"] == category)]
+    return filtered_df
+
+def filter_by_distance_and_duration(df: pd.DataFrame, min_distance, max_distance, min_duration, max_duration):
+    """
+    Filter the dataframe by distance and duration.
+
+    Distance is in 100 meters and duration is in minutes.
+    """
+    filtered_df = df[(df["AfstV"] >= min_distance) & (df["AfstV"] <= max_distance) &
+                     (df["Reisduur"] >= min_duration) & (df["Reisduur"] <= max_duration)]
+    return filtered_df
+
+def filter_by_origin(df: pd.DataFrame, origins):
+    """
+    Filter the dataframe by origin.
+    """
+    filtered_df = df[df["VertPC"].isin(origins)]
+    return filtered_df
+    
+def filter_by_destination(df: pd.DataFrame, destinations):
+    """
+    Filter the dataframe by destination.
+    """
+    filtered_df = df[df["AankPC"].isin(destinations)]
+    return filtered_df

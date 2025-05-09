@@ -4,22 +4,23 @@ import pandas as pd
 from codebase.load_data.load_demographics import load_excel
 
 
-def make_ml_dataset(df, target_col, drop_cols, categorical_cols, target_val=None, test_size=0.2, random_state=42):
+def make_ml_dataset(df, target_col, drop_cols, categorical_cols=None, target_val=None, test_size=0.2, random_state=42, stratification_col=None) -> tuple:
     """
     Splits the dataset into training and testing sets.
     """
     from sklearn.model_selection import train_test_split
 
     # Drop specified columns
-    df = df.drop(columns=drop_cols)
+    df_ = df.drop(columns=drop_cols)
 
     # Split the data into features and target
-    X = df.drop(columns=[target_col])
-    X = pd.get_dummies(X, columns=categorical_cols, drop_first=True)
-    y = df[target_col] == target_val if target_val is not None else df[target_col]
+    X = df_.drop(columns=[target_col])
+    X = pd.get_dummies(X, columns=categorical_cols, drop_first=True) if categorical_cols else X
+    y = df_[target_col] == target_val if target_val is not None else df_[target_col]
+    stratification = df_[stratification_col] if stratification_col else None
 
     # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=stratification)
 
     return X_train, X_test, y_train, y_test
 
