@@ -2,9 +2,10 @@ import os
 import pandas as pd
 
 
-def load_demograhics(demographics_filename = "data/demographics/kwb-2023.csv"):
-    """Wrapper for loading the demographics data."""
-    return load_excel(demographics_filename)
+def load_demograhics():
+    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data/demographics/kwb-2023.xlsx"))
+    return load_excel(base_path)
+
 
 def load_excel(filename):
     """
@@ -24,3 +25,6 @@ def load_excel(filename):
         print("Loaded file from Excel and saved to CSV")
 
     return df
+
+df = load_demograhics()
+df.head()
