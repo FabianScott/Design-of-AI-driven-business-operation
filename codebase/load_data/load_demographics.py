@@ -1,26 +1,36 @@
 import os
 import pandas as pd
+from pathlib import Path
+
+def get_project_root():
+    return Path(__file__).resolve().parents[2]
 
 
-def load_demograhics(demographics_filename = "data/demographics/kwb-2023.csv"):
-    """Wrapper for loading the demographics data."""
-    return load_excel(demographics_filename)
+from pathlib import Path
+from codebase.utils.path_utils import get_project_root
+import pandas as pd
 
-def load_excel(filename):
-    """
-    Load an excel file and save it as a CSV file for faster loading in the future.
-    If the CSV file already exists, load it instead of the excel file.
-    """
-    filename_csv = filename.replace("xlsx", "csv")
-    filename_excel = filename.replace("csv", "xlsx")
+def load_excel(filename_rel_to_root):
+    project_root = get_project_root()
+    filename_csv = project_root / filename_rel_to_root
+    filename_excel = filename_csv.with_suffix(".xlsx")
 
-    if os.path.exists(filename_csv) and filename.endswith("csv"):
-        # Check if the file is a CSV file and load it directly
+    if filename_csv.exists():
         df = pd.read_csv(filename_csv, sep=";", low_memory=False)
-        print("Loaded file from CSV")
-    else:
-        df = pd.read_excel(filename_excel, engine="openpyxl", )
+        print(f"Loaded file from CSV: {filename_csv}")
+    elif filename_excel.exists():
+        df = pd.read_excel(filename_excel, engine="openpyxl")
         df.to_csv(filename_csv, sep=";", index=False)
-        print("Loaded file from Excel and saved to CSV")
+        print(f"Loaded from Excel and saved to CSV: {filename_excel}")
+    else:
+        raise FileNotFoundError(f"Neither {filename_csv} nor {filename_excel} could be found.")
 
     return df
+
+def load_demograhics():
+    return load_excel("data/demographics/kwb-2023.csv")
+
+
+df = load_demograhics()
+print(df.head())
+

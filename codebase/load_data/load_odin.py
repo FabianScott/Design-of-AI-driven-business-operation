@@ -31,7 +31,9 @@ def load_odin_as_ml_dataset(
         validation_proportion=None,
         random_state=42,
 ):
-    odin_excel_path = os.path.join(os.getcwd(), "data", "OdiN 2019-2023", f"OdiN {year}", f"ODiN{year}_Databestand.csv")
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # gaat twee mappen omhoog vanaf dit bestand
+    odin_excel_path = os.path.join(BASE_DIR, "data", "OdiN 2019-2023", f"OdiN {year}", f"ODiN{year}_Databestand.csv")
+
     df = load_excel(odin_excel_path)
 
     moving_cols = [
