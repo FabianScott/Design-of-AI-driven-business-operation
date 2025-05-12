@@ -11,3 +11,4 @@ transport_mode_col = "KHvm"  # Transport mode column in the dataframe
 origin_col = "VertPC"  # Origin column in the dataframe
 destination_col = "AankPC"  # Destination column in the dataframe
 motive_col = "KMotiefV"  # Categorical motive column in the dataframe
+id_col = "OPID"  # ID column in the dataframe

@@ -4,11 +4,15 @@ import pandas as pd
 from codebase.data.load_demographics import load_excel
 
 
-def make_ml_dataset(df, target_col, drop_cols, categorical_cols=None, target_val=None, test_size=0.2, random_state=42, stratification_col=None) -> tuple:
+def make_ml_dataset(df, target_col, drop_cols, categorical_cols=None, target_val=None, test_size=0.2, random_state=42, stratification_col=None, group_col=None) -> tuple:
     """
     Splits the dataset into training and testing sets.
     """
     from sklearn.model_selection import train_test_split
+    from sklearn.model_selection import GroupShuffleSplit
+
+    if stratification_col is not None and group_col is not None:
+        raise ValueError("Cannot use both stratification_col and group_col for splitting.")
 
     # Drop specified columns
     df_ = df.drop(columns=drop_cols)
@@ -20,7 +24,13 @@ def make_ml_dataset(df, target_col, drop_cols, categorical_cols=None, target_val
     stratification = df_[stratification_col] if stratification_col else None
 
     # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=stratification)
+    if group_col:
+        gss = GroupShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)
+        train_idx, test_idx = next(gss.split(X, y, groups=df_[group_col]))
+        X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
+        y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
+    else:
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=stratification)
 
     return X_train, X_test, y_train, y_test
 

@@ -9,7 +9,7 @@ from sklearn.pipeline import make_pipeline
 
 from codebase.data.load_odin import make_ml_dataset
 from codebase.data.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_destination, filter_by_motive, transport_modes
-from codebase.data.column_names import transport_mode_col
+from codebase.data.column_names import transport_mode_col, id_col
 from codebase.plotting.plots import plot_confusion_matrix
 
 
@@ -86,11 +86,12 @@ def run_multiclass_classification(
     X_train, X_test, y_train, y_test = make_ml_dataset(
         df_filtered,
         target_col=transport_mode_col,
-        drop_cols=[col for col in df.columns if col not in [transport_mode_col] + 
+        drop_cols=[col for col in df.columns if col not in [transport_mode_col, id_col] + 
                    (categorical_features if categorical_features is not None else []) +
                    (numerical_features if numerical_features is not None else [])],
         categorical_cols=categorical_features,
-        test_size=test_size
+        test_size=test_size,
+        group_col=id_col,
         )
 
     scaler = MinMaxScaler()
