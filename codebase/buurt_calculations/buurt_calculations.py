@@ -109,3 +109,27 @@ def get_total_inhabitants_and_willingness(punt1, mode, within_mins, location="El
         print(f"Total willingness to cycle of those: {total_willing_cyclists} of {total_inhabitants} = {total_willing_cyclists/total_inhabitants:.2%}")
     
     return total_inhabitants, total_willing_cyclists
+
+
+def number_of_residents_in_detour(detour_factor, punt, mode, within_mins):
+    """
+    Returns a DataFrame of neighborhoods (bu_codes) where the detour factor exceeds a given threshold,
+    along with the population.
+    """
+    demographics = load_demograhics()
+    df_punt = load_buurt_data(punt, mode)
+    df = filter_by_time(df_punt, within_mins)
+
+    high_detour = df[df['omrijdfactor'] > detour_factor]
+
+    merged_df = high_detour.merge(
+        demographics[['gwb_code', 'a_inw']], 
+        how='left',
+        left_on='bu_code',
+        right_on='gwb_code'
+    )
+
+    merged_df.drop(columns=['gwb_code'], inplace=True)
+    merged_df.sort_values(by='a_inw', ascending=False, inplace=True)
+    
+    return merged_df
