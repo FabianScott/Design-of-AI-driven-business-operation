@@ -38,9 +38,10 @@ def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', sh
         plt.show()
 
 
-def plot_binary_regression(X_test, y_test, y_pred, transport_mode_str, destinations, savename=None):
+def plot_binary_regression(X_test, y_test, y_pred, transport_modes_predict, destinations, savename=None):
     # Bin settings
     bins = 50
+    transport_mode_str = ", ".join([transport_modes[mode] for mode in transport_modes_predict])
 
     # Compute average actual cycling per bin
     bin_means, bin_edges, _ = binned_statistic(X_test[distance_col].values.flatten(), y_test.values.flatten(), statistic='mean', bins=bins)

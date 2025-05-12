@@ -15,7 +15,7 @@ from codebase.plotting.plots import plot_binary_regression
 
 def run_binary_regression(
         df: pd.DataFrame, 
-        transport_mode=5, 
+        transport_modes_predict=[5,], 
         test_size=0.02, 
         max_dist=np.inf, 
         origins=None, 
@@ -36,8 +36,8 @@ def run_binary_regression(
     ----------
     df : pd.DataFrame
         The input dataframe containing the data.
-    transport_mode : int, optional
-        The transport mode to predict. Default is 5 (Bicycle).
+    transport_modes : list[int], optional
+        The transport modes to predict. Default is 5 (Bicycle).
     test_size : float, optional
         The proportion of the dataset to include in the test split. Default is 0.02.
     max_dist : int, optional
@@ -81,7 +81,7 @@ def run_binary_regression(
     X_train, X_test, y_train, y_test = make_ml_dataset(
         df_filtered,
         target_col=transport_mode_col,
-        target_val=transport_mode,  # see load_data/filters.py for KHvm value dictionary
+        target_vals=transport_modes_predict,  # see load_data/filters.py for KHvm value dictionary
         drop_cols=[col for col in df.columns if col not in [transport_mode_col, distance_col, id_col] + 
                    (additional_features if additional_features is not None else [])],
         categorical_cols=None,
@@ -97,6 +97,6 @@ def run_binary_regression(
     y_pred = pipeline.predict_proba(X_test)[:, 1]  # Get the probability of cycling
 
     if plot:
-        plot_binary_regression(X_test, y_test, y_pred, transport_modes[transport_mode], motives, savename=savename)
+        plot_binary_regression(X_test, y_test, y_pred, transport_modes_predict, motives, savename=savename)
 
     return pipeline, (X_train, X_test, y_test, y_pred)
