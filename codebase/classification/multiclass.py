@@ -101,9 +101,10 @@ def run_multiclass_classification(
     y_pred = pipeline.predict(X_test)
 
     if plot:
+        transport_modes_plot = {k: v for k, v in transport_modes.items() if k in y_test.unique()}
         cm = confusion_matrix(y_test, y_pred)
-        plot_confusion_matrix(cm, labels=transport_modes.values(), title="Confusion Matrix", savename=savename)
+        plot_confusion_matrix(cm, labels=transport_modes_plot.values(), title="Confusion Matrix", savename=savename)
 
-        print(classification_report(y_test, y_pred, target_names=transport_modes.values()))
+        print(classification_report(y_test, y_pred, target_names=transport_modes_plot.values()))
 
     return pipeline, (X_train, X_test, y_test, y_pred)
