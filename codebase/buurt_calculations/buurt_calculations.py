@@ -11,7 +11,6 @@ from codebase.data.column_names import (
     willingness_to_cycle_column,
     punt_detour_column,
 )
-from codebase.plotting.plots import plot_value_by_buurt_heatmap
 
 
 # Helper functions:
@@ -192,6 +191,7 @@ def calculate_added_willingness(
     df_filtered.loc[improvement_mask, improvement_column] = np.round(n_improvement)
     
     if plot:
+        from codebase.plotting.plots import plot_value_by_buurt_heatmap
         plot_value_by_buurt_heatmap(
             df_filtered, 
             col_name=col_to_plot, 

@@ -5,9 +5,7 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 from scipy.stats import binned_statistic
 
-from codebase.data import load_buurt_data
-from codebase.buurt_calculations import filter_by_time, willingness_to_cycle, punt_travel_time_column
-from codebase.data.column_names import distance_col
+from codebase.data.column_names import distance_col, punt_buurt_code_column
 from codebase.data.codebook_dicts import trip_motives, transport_modes
 
 
@@ -40,33 +38,6 @@ def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', sh
         plt.show()
 
 
-def plot_willingness_by_buurt_heatmap(punt2, mode, location, show=True, savename=None, cmap='viridis'):
-    df_punt = load_buurt_data(punt2, mode=mode,)
-    gdf = gpd.read_file("data/WijkBuurtkaart_2023_v2/wijkenbuurten_2023_v2.gpkg", layer="buurten")
-    # Remove the empty buurts
-    gdf = gdf[gdf["aantal_inwoners"] > 0]
-    # Use only the closest location to each buurt:
-    df_punt = filter_by_time(df_punt, np.inf) 
-    df_punt["buurtcode"] = df_punt["bu_code"]
-    # Add the willingness to cycle % column to the dataframe
-    willingness_column_name = f"{punt2}_by_{mode}_willingness"
-    df_punt[willingness_column_name] = willingness_to_cycle(df_punt[punt_travel_time_column].values, mode=mode, location=location) # gdf["aantal_inwoners"]
-    # Merge the two dataframes on the buurtcode, and fill the NaN values with 0
-    gdf = gdf.merge(df_punt, on='buurtcode', how='left')
-    gdf = gdf.fillna(0)
-
-    fig = plt.figure(figsize=(10, 10), frameon=False)
-    gdf.plot(column=willingness_column_name, cmap=cmap, markersize=5, legend=True)
-
-    plt.title(f"Heatmap of willingness to cycle to {punt2} by {mode} in %")
-    plt.axis("off")
-    plt.tight_layout()
-    if savename is not None:
-        os.makedirs(os.path.dirname(savename), exist_ok=True)
-        plt.savefig(savename, bbox_inches='tight', dpi=300)
-    if show:
-        plt.show()
-
 def plot_binary_regression(X_test, y_test, y_pred, transport_mode_str, destinations, savename=None):
     # Bin settings
     bins = 50
@@ -93,3 +64,24 @@ def plot_binary_regression(X_test, y_test, y_pred, transport_mode_str, destinati
         os.makedirs(os.path.dirname(savename), exist_ok=True)
         plt.savefig(savename, dpi=300)
     plt.show()
+
+def plot_value_by_buurt_heatmap(df_punt, col_name, show=True, savename=None, cmap='viridis'):
+    gdf = gpd.read_file("data/WijkBuurtkaart_2023_v2/wijkenbuurten_2023_v2.gpkg", layer="buurten")
+    # Remove the empty buurts
+    gdf = gdf[gdf["aantal_inwoners"] > 0]
+    df_punt["buurtcode"] = df_punt[punt_buurt_code_column].astype(str)
+    # Merge the two dataframes on the buurtcode, and fill the NaN values with 0
+    gdf = gdf.merge(df_punt, on='buurtcode', how='left')
+    gdf = gdf.fillna(0)
+
+    fig = plt.figure(figsize=(10, 10), frameon=False)
+    gdf.plot(column=col_name, cmap=cmap, markersize=5, legend=True)
+
+    plt.title(f"Heatmap of {col_name} by Buurt")
+    plt.axis("off")
+    plt.tight_layout()
+    if savename is not None:
+        os.makedirs(os.path.dirname(savename), exist_ok=True)
+        plt.savefig(savename, bbox_inches='tight', dpi=300)
+    if show:
+        plt.show()
