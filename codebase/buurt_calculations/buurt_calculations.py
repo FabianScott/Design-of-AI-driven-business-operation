@@ -24,13 +24,13 @@ def get_buurt_ids(df: pd.DataFrame) -> list:
     df_buurt = df[[punt_buurt_code_column]].astype(str)
     return df_buurt.values.flatten().tolist()
 
-def add_willingness_to_cycle_column(df: pd.DataFrame, location: str, mode="fiets") -> pd.DataFrame:
-    willingness_array = willingness_to_cycle(df[punt_travel_time_column], location, mode=mode)
+def add_willingness_to_cycle_column(df: pd.DataFrame, location: str, mode="fiets", travel_time_col=punt_travel_time_column, willingness_col=willingness_to_cycle_column) -> pd.DataFrame:
+    willingness_array = willingness_to_cycle(df[travel_time_col], location, mode=mode)
     df_filtered = df.copy()
-    df_filtered[willingness_to_cycle_column] = willingness_array
+    df_filtered[willingness_col] = willingness_array
     return df_filtered
 
-# Function to calculate the total number of inhabitants and willingness to cycle within a certain time frame
+# Function to calculate the total number of inhabitants willing to cycle within a certain time frame
 def get_total_inhabitants_in_buurts(df, within_mins, df_demographics=None):
     df_filtered = filter_by_time(df, within_mins)
     df_demographics = load_demograhics() if df_demographics is None else df_demographics
@@ -40,27 +40,37 @@ def get_total_inhabitants_in_buurts(df, within_mins, df_demographics=None):
     total_inhabitants = df_location[demographics_population_column].sum()
     return total_inhabitants
 
-def get_total_willingness_to_cycle_in_buurts(df: pd.DataFrame, location, within_mins, mode, df_demographics=None, ):
-    df_demographics = load_demograhics() if df_demographics is None else df_demographics
-    df_filtered = filter_by_time(df, within_mins)
-    # Get the unique buurt codes from the filtered dataframe
+def align_by_buurt(df_filtered, df_demographics) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Aligns the filtered dataframe with the demographics dataframe by buurt code.
+    """
     buurt_ids = get_buurt_ids(df_filtered)
-    df_filtered = add_willingness_to_cycle_column(df_filtered, location, mode=mode)
-    # Filter the demographics dataframe to only include the relevant buurt codes
     df_location = df_demographics[df_demographics[demographics_buurt_code_column].astype(str).isin(buurt_ids)]
 
     if len(df_location) != len(df_filtered):
         print(f"Demographics and filtered dataframes do not match in length: {len(df_location)} vs {len(df_filtered)}, ignoring missing values")
-    
+
     s1 = set(df_filtered[punt_buurt_code_column].unique())
     s2 = set(df_location[demographics_buurt_code_column].unique())
-   # Only keep the rows in both dataframes that have matching buurt codes
+    # Only keep the rows in both dataframes that have matching buurt codes
     df_filtered = df_filtered[df_filtered[punt_buurt_code_column].isin(s1.intersection(s2))]
     df_location = df_location[df_location[demographics_buurt_code_column].isin(s1.intersection(s2))]
     # Sort the dataframes by the buurt code to ensure they match
     df_filtered = df_filtered.sort_values(by=punt_buurt_code_column)
     df_location = df_location.sort_values(by=demographics_buurt_code_column)
 
+    df_filtered.reset_index(drop=True, inplace=True)
+    df_location.reset_index(drop=True, inplace=True)
+
+    return df_filtered, df_location
+
+def get_total_willingness_to_cycle_in_buurts(df: pd.DataFrame, location, within_mins, mode, df_demographics=None, ):
+    df_demographics = load_demograhics() if df_demographics is None else df_demographics
+    df_filtered = filter_by_time(df, within_mins)
+    # Get the unique buurt codes from the filtered dataframe
+    df_filtered = add_willingness_to_cycle_column(df_filtered, location, mode=mode)
+    # Filter the demographics dataframe to only include the relevant buurt codes
+    df_filtered, df_location = align_by_buurt(df_filtered, df_demographics)
     total_willingness = int((df_filtered[willingness_to_cycle_column].values * df_location[demographics_population_column].values).sum())
     return total_willingness
 
