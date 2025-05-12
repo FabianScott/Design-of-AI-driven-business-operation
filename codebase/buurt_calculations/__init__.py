@@ -10,6 +10,8 @@ from .buurt_calculations import (
     get_total_inhabitants_in_buurts,
     get_total_willingness_to_cycle_in_buurts,
     get_total_inhabitants_and_willingness,
-    align_by_buurt
+    align_by_buurt,
+    calculate_added_willingness,
+    number_of_residents_in_detour
 )
 from .willingness import willingness_to_cycle

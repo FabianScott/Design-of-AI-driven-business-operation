@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from codebase.data.load_demographics import load_demograhics
 from .willingness import willingness_to_cycle
@@ -8,7 +9,9 @@ from codebase.data.column_names import (
     punt_travel_time_column,
     punt_buurt_code_column,
     willingness_to_cycle_column,
+    punt_detour_column,
 )
+from codebase.plotting.plots import plot_value_by_buurt_heatmap
 
 
 # Helper functions:
@@ -133,3 +136,67 @@ def number_of_residents_in_detour(detour_factor, punt, mode, within_mins):
     merged_df.sort_values(by='a_inw', ascending=False, inplace=True)
     
     return merged_df
+
+def calculate_added_willingness(
+        df_punt, 
+        df_demographics,
+        mode="fiets",
+        location="Education",
+        detour_max=1.2,
+        detour_reduction=None,
+        improvement_column="n_extra_inhabitants_now_willing",
+        savename=None,
+        plot=True,
+        col_to_plot="n_extra_inhabitants_now_willing",
+        ):
+    """
+    Calculate the added willingness to cycle given a maximum detour factor.
+    If detour reduction is not None, it will be used to reduce the travel time as 
+    a proportion of the original travel time applied only to buurts over detour_max.
+    If detour reduction is None, the reduction will be calculated based on the 
+    maximum detour factor.
+    The new travel time will be stored in a new column with the suffix "_new".
+    """
+    # Remove duplicates and keep only the smallest travel time
+    df_filtered = filter_by_time(df_punt, max_time=np.inf)
+    # Align the dataframes by buurt code
+    df_filtered, df_location = align_by_buurt(df_filtered, df_demographics,)
+
+    new_travel_time_col = punt_travel_time_column + "_new"
+    new_willingness_col = willingness_to_cycle_column + "_new"
+
+    detour_is_greater = df_filtered[punt_detour_column] > detour_max
+    new_time = df_filtered[punt_travel_time_column].copy()
+    # Calculate the new travel time based on the detour factor
+    
+    if detour_reduction is not None:
+        new_time[detour_is_greater] = df_filtered[punt_travel_time_column][detour_is_greater] * detour_reduction
+    else:
+        # Calculate the improvement ratio based on the maximum detour factor
+        improvement_ratio = detour_max / df_filtered[punt_detour_column][detour_is_greater]
+        new_time[detour_is_greater] = df_filtered[punt_travel_time_column][detour_is_greater] * improvement_ratio
+    
+    df_filtered[new_travel_time_col] = new_time
+
+    df_filtered = add_willingness_to_cycle_column(df_filtered, location=location, mode=mode, travel_time_col=punt_travel_time_column, willingness_col=willingness_to_cycle_column)
+    df_filtered = add_willingness_to_cycle_column(df_filtered, location=location, mode=mode, travel_time_col=new_travel_time_col, willingness_col=new_willingness_col)
+    
+    # Calculate the difference in willingness to cycle
+    df_filtered["willingness_diff"] = df_filtered[new_willingness_col] - df_filtered[willingness_to_cycle_column]
+    # Calculate the proportion of the difference relative to the original willingness to cycle
+    df_filtered["willingness_diff_proportion"] = (df_filtered["willingness_diff"] / df_filtered[willingness_to_cycle_column])
+    
+    improvement_mask = df_filtered["willingness_diff_proportion"] > 0
+    df_filtered[improvement_column] = 0
+    n_improvement = df_location[demographics_population_column][improvement_mask].values * df_filtered["willingness_diff_proportion"][improvement_mask].values
+    df_filtered.loc[improvement_mask, improvement_column] = np.round(n_improvement)
+    
+    if plot:
+        plot_value_by_buurt_heatmap(
+            df_filtered, 
+            col_name=col_to_plot, 
+            show=True, 
+            savename=savename, 
+            cmap='viridis'
+        )
+    return df_filtered

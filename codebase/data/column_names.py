@@ -3,6 +3,9 @@ demographics_buurt_code_column = "gwb_code"
 punt_travel_time_column = 'reistijd_min'
 punt_buurt_code_column = 'bu_code'
 willingness_to_cycle_column = 'willingness_to_cycle_percentage'
+punt_detour_column = 'omrijdfactor'
+punt_distance_column = 'reisafstand_m'
+
 
 # Columns for ODIN
 distance_col = "AfstV"  # Distance column in the dataframe

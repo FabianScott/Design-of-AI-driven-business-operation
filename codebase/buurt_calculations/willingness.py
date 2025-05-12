@@ -23,3 +23,4 @@ def willingness_to_cycle(tij, location, mode="fiets", param_path=None):
     F_ij = 1 / (1 + np.exp(a + b * np.log(tij + 1e-10)))
     
     return F_ij
+
