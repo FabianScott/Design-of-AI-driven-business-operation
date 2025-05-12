@@ -80,7 +80,7 @@ def run_multiclass_classification(
             The predicted probabilities for the test set.
     """
     df_filtered = filter_by_distance_and_duration(df, 0, max_dist, 0, np.inf)
-    df_filtered = filter_by_origin(df_filtered, origins, level=location_level) if origins else df_filtered
+    df_filtered = filter_by_origin(df_filtered, origins, level=location_level) if origins is not None else df_filtered
     df_filtered = filter_by_destination(df_filtered, destinations, level=location_level) if destinations else df_filtered
     df_filtered = filter_by_motive(df_filtered, motives) if motives else df_filtered
 
