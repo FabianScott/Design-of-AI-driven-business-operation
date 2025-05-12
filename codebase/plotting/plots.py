@@ -8,6 +8,7 @@ from scipy.stats import binned_statistic
 from codebase.data import load_buurt_data
 from codebase.buurt_calculations import filter_by_time, willingness_to_cycle, punt_travel_time_column
 from codebase.data.column_names import distance_col
+from codebase.data.codebook_dicts import trip_motives, transport_modes
 
 
 def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', show=True, savename=None):
@@ -78,12 +79,12 @@ def plot_binary_regression(X_test, y_test, y_pred, transport_mode_str, destinati
     plt.figure(figsize=(10, 6))
     plt.scatter(X_test[distance_col], y_pred, label="Predicted probability", alpha=0.5, color="orange", s=10)
     plt.scatter(X_test[distance_col], y_test, label="Actual binary value", alpha=0.5, color="blue", s=10)
-    plt.plot(bin_centers, bin_means, label=f"Actual {transport_mode_str} rate (binned)", color="green", linewidth=2)
+    plt.scatter(bin_centers, bin_means, label=f"Actual {transport_mode_str} rate (binned)", color="green", linewidth=2, s=15)
 
     # add the histogram of the actual values
     plt.xlabel("Distance (100m)")
     plt.ylabel(f"Predicted probability of {transport_mode_str}")
-    plt.title(f"Predicted probability of {transport_mode_str} by distance to {destinations}")
+    plt.title(f"Predicted probability of {transport_mode_str} by distance to {', '.join(trip_motives[dest] for dest in destinations)}")
     plt.legend()
     plt.grid()
     plt.tight_layout()
