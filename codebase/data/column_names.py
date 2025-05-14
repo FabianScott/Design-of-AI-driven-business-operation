@@ -17,3 +17,4 @@ motive_col = "KMotiefV"         # Categorical motive column in the dataframe
 id_col = "OPID"                 # ID column in the dataframe
 age_col = "Leeftijd"           # Age column in the dataframe
 urbanness_col = "Sted"       # Urbanity column in the dataframe
+goal_col = "Doel"                # Goal column in the dataframe
