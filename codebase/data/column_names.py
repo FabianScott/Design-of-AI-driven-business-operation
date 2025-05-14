@@ -15,3 +15,4 @@ origin_col = "VertPC"           # Origin column in the dataframe
 destination_col = "AankPC"      # Destination column in the dataframe
 motive_col = "KMotiefV"         # Categorical motive column in the dataframe
 id_col = "OPID"                 # ID column in the dataframe
+age_col = "Leeftijd"           # Age column in the dataframe
