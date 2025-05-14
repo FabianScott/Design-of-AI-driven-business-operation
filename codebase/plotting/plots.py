@@ -56,7 +56,8 @@ def plot_binary_regression(X_test, y_test, y_pred, transport_modes_predict, dest
     # add the histogram of the actual values
     plt.xlabel("Distance (100m)")
     plt.ylabel(f"Predicted probability of {transport_mode_str}")
-    plt.title(f"Predicted probability of {transport_mode_str} by distance to {', '.join(trip_motives[dest] for dest in destinations)}")
+    plt.title(f"Predicted probability of {transport_mode_str} by distance")
+    plt.ylim(0, 1.05)
     plt.legend()
     plt.grid()
     plt.tight_layout()

@@ -92,7 +92,12 @@ def run_binary_regression(
     scaler = MinMaxScaler()
     model = LogisticRegression()
     pipeline = make_pipeline(scaler, model)
-    pipeline.fit(X_train, y_train)
+    try:
+        pipeline.fit(X_train, y_train)
+    except ValueError as e:
+        print(f"Error fitting the model: {e}")
+        print("Check if the target variable has only one class in the training set.")
+        return None, None
 
     y_pred = pipeline.predict_proba(X_test)[:, 1]  # Get the probability of cycling
 

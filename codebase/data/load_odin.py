@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 
 from codebase.data.load_demographics import load_excel
@@ -31,6 +32,21 @@ def make_ml_dataset(df: pd.DataFrame, target_col, drop_cols, categorical_cols=No
         y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
     else:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=stratification)
+
+    # 1. Find the set of labels that occur in both y_train and y_test
+    common_labels = np.intersect1d(np.unique(y_train), np.unique(y_test))
+
+    print(f"Common labels: {common_labels}")
+
+    # 2. Create boolean masks
+    train_mask = y_train.isin(common_labels)
+    test_mask = y_test.isin(common_labels)
+
+    # 3. Filter both sets
+    X_train = X_train[train_mask]
+    y_train = y_train[train_mask]
+    X_test = X_test[test_mask]
+    y_test = y_test[test_mask]
 
     return X_train, X_test, y_train, y_test
 
