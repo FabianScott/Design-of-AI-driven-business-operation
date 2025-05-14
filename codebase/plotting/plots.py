@@ -24,7 +24,7 @@ def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', sh
     """
 
 
-    plt.figure(figsize=(10, 8))
+    plt.figure(figsize=(len(cm), len(cm)))
     sns.heatmap(cm, annot=True, fmt='d', cmap=cmap,
                 xticklabels=labels, yticklabels=labels)
     plt.title(title)
