@@ -127,7 +127,7 @@ def number_of_residents_in_detour(detour_factor, punt, mode, within_mins):
     high_detour = df[df['omrijdfactor'] > detour_factor]
 
     merged_df = high_detour.merge(
-        demographics[['gwb_code', 'a_inw']], 
+        demographics[['gwb_code', 'a_inw', 'gm_naam']], 
         how='left',
         left_on='bu_code',
         right_on='gwb_code'
