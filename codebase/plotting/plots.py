@@ -24,7 +24,7 @@ def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', sh
     """
 
 
-    plt.figure(figsize=(10, 8))
+    plt.figure(figsize=(len(cm), len(cm)))
     sns.heatmap(cm, annot=True, fmt='d', cmap=cmap,
                 xticklabels=labels, yticklabels=labels)
     plt.title(title)
@@ -38,9 +38,10 @@ def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', sh
         plt.show()
 
 
-def plot_binary_regression(X_test, y_test, y_pred, transport_mode_str, destinations, savename=None):
+def plot_binary_regression(X_test, y_test, y_pred, transport_modes_predict, destinations, savename=None):
     # Bin settings
     bins = 50
+    transport_mode_str = ", ".join([transport_modes[mode] for mode in transport_modes_predict])
 
     # Compute average actual cycling per bin
     bin_means, bin_edges, _ = binned_statistic(X_test[distance_col].values.flatten(), y_test.values.flatten(), statistic='mean', bins=bins)
@@ -55,7 +56,8 @@ def plot_binary_regression(X_test, y_test, y_pred, transport_mode_str, destinati
     # add the histogram of the actual values
     plt.xlabel("Distance (100m)")
     plt.ylabel(f"Predicted probability of {transport_mode_str}")
-    plt.title(f"Predicted probability of {transport_mode_str} by distance to {', '.join(trip_motives[dest] for dest in destinations)}")
+    plt.title(f"Predicted probability of {transport_mode_str} by distance")
+    plt.ylim(0, 1.05)
     plt.legend()
     plt.grid()
     plt.tight_layout()
