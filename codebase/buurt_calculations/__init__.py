@@ -14,6 +14,16 @@ from .buurt_calculations import (
     calculate_added_willingness,
     number_of_residents_in_detour,
     read_all_punt_to_punt,
-    make_detour_matrix    
+    make_detour_matrix
+)
+
+
+from .municipality_calculations import (                 # new names
+    load_municipality_geometry,
+    population_weighted_detour,
+    detour_vs_population,
 )
 from .willingness import willingness_to_cycle
+
+
+
