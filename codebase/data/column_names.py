@@ -8,10 +8,13 @@ punt_distance_column = 'reisafstand_m'
 
 
 # Columns for ODIN
-distance_col = "AfstV"  # Distance column in the dataframe
-duration_col = "Reisduur"  # Duration column in the dataframe
-transport_mode_col = "KHvm"  # Transport mode column in the dataframe
-origin_col = "VertPC"  # Origin column in the dataframe
-destination_col = "AankPC"  # Destination column in the dataframe
-motive_col = "KMotiefV"  # Categorical motive column in the dataframe
-id_col = "OPID"  # ID column in the dataframe
+distance_col = "AfstV"          # Distance column in the dataframe
+duration_col = "Reisduur"       # Duration column in the dataframe
+transport_mode_col = "Rvm"     # Transport mode column in the dataframe    Floris: I think this should be Rvm
+origin_col = "VertPC"           # Origin column in the dataframe   
+destination_col = "AankPC"      # Destination column in the dataframe
+motive_col = "KMotiefV"         # Categorical motive column in the dataframe
+id_col = "OPID"                 # ID column in the dataframe
+age_col = "Leeftijd"           # Age column in the dataframe
+urbanness_col = "Sted"       # Urbanity column in the dataframe
+goal_col = "Doel"                # Goal column in the dataframe

@@ -94,6 +94,8 @@ def run_multiclass_classification(
         test_size=test_size,
         group_col=id_col,
         )
+    
+    
 
     scaler = MinMaxScaler()
     model = RandomForestClassifier(random_state=42, n_jobs=-1, max_depth=10, n_estimators=100, class_weight="balanced") if model is None else model

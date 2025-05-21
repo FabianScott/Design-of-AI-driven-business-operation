@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from codebase.data.load_demographics import load_demograhics
 from .willingness import willingness_to_cycle
 from codebase.data.load_buurt import load_buurt_data
@@ -125,7 +127,7 @@ def number_of_residents_in_detour(detour_factor, punt, mode, within_mins):
     high_detour = df[df['omrijdfactor'] > detour_factor]
 
     merged_df = high_detour.merge(
-        demographics[['gwb_code', 'a_inw']], 
+        demographics[['gwb_code', 'a_inw', 'gm_naam']], 
         how='left',
         left_on='bu_code',
         right_on='gwb_code'
@@ -200,3 +202,65 @@ def calculate_added_willingness(
             cmap='viridis'
         )
     return df_filtered
+
+
+def read_all_punt_to_punt(punten, modes):
+    """
+    Reads all punt to punt files defined in the list of punt names and modes.
+    """
+    matrix_data = {}
+
+    for punt in punten:
+        for mode in modes:
+            key = f"{punt}_{mode}"
+            try:
+                df = load_buurt_data(punt, mode)
+                matrix_data[key] = df.copy()
+            except Exception as e:
+                print(f"Skipping {key}: {e}")
+
+    return matrix_data
+
+def make_detour_matrix(matrix_data):
+    """
+    Makes a matrix of the read all punt to punt dataframes. Takes matrix_data as input.
+    """ 
+    # Define bin edges
+    bins = [1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, float("inf")]
+
+    # Generate labels automatically
+    labels = [
+        f"{bins[i]:.2f}–{bins[i+1]:.2f}" if bins[i+1] != float("inf") else f">{bins[i]:.2f}"
+        for i in range(len(bins) - 1)
+    ]
+
+    proportion_matrix = {}
+    for key, df in matrix_data.items():
+        # Bin the omrijdfactor
+        df["bin"] = pd.cut(df["omrijdfactor"], bins=bins, labels=labels, right=False)
+        
+        # Count per bin
+        counts = df["bin"].value_counts().reindex(labels, fill_value=0)
+        total = counts.sum()
+        
+        # Store row-wise proportions
+        proportions = counts / total if total > 0 else [0] * len(labels)
+        proportion_matrix[key] = proportions
+
+
+    # Convert to matrix DataFrame
+    matrix_df = pd.DataFrame(proportion_matrix).T  # Transpose so rows are punt_mode
+    matrix_df.index.name = "punt_mode"
+    matrix_df.columns.name = "omrijdfactor_bin"
+
+    # Display as a table
+    #print(matrix_df)
+
+    # Plot heatmap
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(matrix_df, annot=True, cmap='Blues', linewidths=0.5, cbar_kws={'label': 'Percentage'})
+    plt.title("Detour Factor Distribution form Punt to Buurt and Mode")
+    plt.ylabel("Punt to Buurt and Mode")
+    plt.xlabel("Detour Factor Bin")
+    plt.tight_layout()
+    plt.show()

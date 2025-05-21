@@ -12,6 +12,8 @@ from .buurt_calculations import (
     get_total_inhabitants_and_willingness,
     align_by_buurt,
     calculate_added_willingness,
-    number_of_residents_in_detour
+    number_of_residents_in_detour,
+    read_all_punt_to_punt,
+    make_detour_matrix    
 )
 from .willingness import willingness_to_cycle

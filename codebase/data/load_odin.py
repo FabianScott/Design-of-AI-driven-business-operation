@@ -1,10 +1,11 @@
 import os
+import numpy as np
 import pandas as pd
 
 from codebase.data.load_demographics import load_excel
 
 
-def make_ml_dataset(df, target_col, drop_cols, categorical_cols=None, target_val=None, test_size=0.2, random_state=42, stratification_col=None, group_col=None) -> tuple:
+def make_ml_dataset(df: pd.DataFrame, target_col, drop_cols, categorical_cols=None, target_vals=None, test_size=0.2, random_state=42, stratification_col=None, group_col=None) -> tuple:
     """
     Splits the dataset into training and testing sets.
     """
@@ -15,12 +16,12 @@ def make_ml_dataset(df, target_col, drop_cols, categorical_cols=None, target_val
         raise ValueError("Cannot use both stratification_col and group_col for splitting.")
 
     # Drop specified columns
-    df_ = df.drop(columns=drop_cols)
+    df_: pd.DataFrame = df.drop(columns=drop_cols)
 
     # Split the data into features and target
     X = df_.drop(columns=[target_col])
     X = pd.get_dummies(X, columns=categorical_cols, drop_first=True) if categorical_cols else X
-    y = df_[target_col] == target_val if target_val is not None else df_[target_col]
+    y = df_[target_col].isin(target_vals) if target_vals is not None else df_[target_col]
     stratification = df_[stratification_col] if stratification_col else None
 
     # Split the data into training and testing sets
@@ -31,6 +32,21 @@ def make_ml_dataset(df, target_col, drop_cols, categorical_cols=None, target_val
         y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
     else:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=stratification)
+
+    # 1. Find the set of labels that occur in both y_train and y_test
+    common_labels = np.intersect1d(np.unique(y_train), np.unique(y_test))
+
+    print(f"Common labels: {common_labels}")
+
+    # 2. Create boolean masks
+    train_mask = y_train.isin(common_labels)
+    test_mask = y_test.isin(common_labels)
+
+    # 3. Filter both sets
+    X_train = X_train[train_mask]
+    y_train = y_train[train_mask]
+    X_test = X_test[test_mask]
+    y_test = y_test[test_mask]
 
     return X_train, X_test, y_train, y_test
 
@@ -258,7 +274,7 @@ def load_odin_as_ml_dataset(
     X_train, X_test, y_train, y_test = make_ml_dataset(
         df, 
         target_col=target_col, 
-        target_val=target_val,
+        target_vals=target_val,
         categorical_cols=categorical_cols, 
         drop_cols=drop_cols
         )

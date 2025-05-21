@@ -1,25 +1,49 @@
 # KHvm
 transport_modes = {
-    1: "Car - driver",
-    2: "Car - passenger",
-    3: "Train",
-    4: "Bus/tram/metro",
-    5: "Bicycle",
-    6: "On foot",
-    7: "Other"
+    1: "Passenger car",
+    2: "Train",
+    3: "Bus",
+    4: "Tram",
+    5: "Metro",
+    6: "Speed pedelec",
+    7: "Electric bicycle",
+    8: "Non-electric bicycle",
+    9: "On foot",
+    10: "Touring car",
+    11: "Delivery van",
+    12: "Truck",
+    13: "Camper",
+    14: "Taxi/Minibus",
+    15: "Agricultural vehicle",
+    16: "Motorcycle",
+    17: "Moped",
+    18: "Light moped",
+    19: "Mobility aid with motor",
+    20: "Mobility aid without motor",
+    21: "Skates/inline skates/kick scooter",
+    22: "Boat",
+    23: "Other with motor",
+    24: "Other without motor"
 }
+
 # KMotiefV
+# KHvm
 trip_motives = {
-    1: "Work",      # Commute to/from work
-    2: "Business",  # Business visit (work-related)
-    3: "Services/personal care",
-    4: "Shopping",  # Groceries
-    5: "Education", # Course
-    6: "Visit/stay overnight",
-    7: "Other social/recreational",
-    8: "Touring/walking",
-    9: "Other motive"
+    1: "Commuting (to and from work)",
+    2: "Business visit (at work location)",
+    3: "Occupational (work-related)",
+    4: "Picking up/dropping off people",
+    5: "Picking up/dropping off goods",
+    6: "Education/course attendance",
+    7: "Shopping/grocery shopping",
+    8: "Visiting/staying over",
+    9: "Touring/hiking",
+    10: "Sports/hobby",
+    11: "Other leisure activity",
+    12: "Services/personal care",
+    13: "Other motive"
 }
+
 
 level_mapping_suffix = {
     0: "PC",
