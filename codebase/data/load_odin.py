@@ -186,84 +186,179 @@ def load_odin_as_ml_dataset(
 
     # ── ORDINAL (128) ──────────────────────────────────────────────────────────────
     ordinal_cols = [
-        "HHSam",        # P – Household composition (1 = Single, 2 = Couple, 3 = Couple + children, 4 = Couple + children + others, 5 = Couple + others, 6 = Single-parent + children, 7 = Single-parent + children + others, 8 = Other, 9 = Unknown)
-        "HHPlOP",       # P – Respondent’s position in household (1 = Single, 2 = Household core, 3 = Partner, 4 = Child, 5 = Other member, 6 = Unknown)
-        "Sted",         # P – Urbanisation class (1 = Very strong, 2 = Strong, 3 = Moderate, 4 = Slight, 5 = Rural)
-        "GemGr",        # P – Municipality size class (1 = <5 k, 2 = 5–10 k, 3 = 10–20 k, 4 = 20–50 k, 5 = 50–100 k, 6 = 100–150 k, 7 = 150–250 k, 8 = ≥250 k)
-        "Prov",         # P – Province (1 = Groningen, 2 = Friesland, 3 = Drenthe, 4 = Overijssel, 5 = Flevoland, 6 = Gelderland, 7 = Utrecht, 8 = North Holland, 9 = South Holland)
-        "MRA",          # P – Amsterdam metro-region zone (1 = Centre, 2 = North, 3 = West, 4 = New-West, 5 = South, 6 = East, 7 = South-East, 8 = Waterland, 9 = Zaanstreek, 10 = IJmond)
-        "MRDH",         # P – Rotterdam/The Hague metro zone (1 = The Hague Centre, 2 = South-West, 3 = North-West, 4 = East, 5 = South-West region, 6 = South region)
-        "Utr",          # P – Utrecht provincial zone (1 = De Ronde Venen etc, … 21 = Rest Netherlands)
-        "Herkomst",     # P – Migration background (1 = Dutch, 2 = Western, 3 = Non-Western, 4 = Unknown)
-        "BetWerk",      # P – Paid work (0 = None, 1 < 12h, 2 = 12–30h, 3 ≥ 30h, 4 = Unknown, 5 = Not asked (<15 yr))
-        "OnbBez",       # P – Unpaid activity (1 = Homemaker, 2 = Retired, 3 = Student, 4 = Disabled, 5 = Unemployed, 6 = Unpaid worker, 7 = Other, 8 = Unknown)
-        "MaatsPart",    # P – Social participation class (1 = 12–30 h work, 2 ≥ 30 h, 3 = Own household, 4 = Student, 5 = Unemployed, 6 = Disabled, 7 = Retired, 8 = Other, 9 = Unknown)
-        "Opleiding",    # P – Highest completed education (0 = None, 1 = Primary, 2 = Lower vocational, 3 = Upper sec/VET, 4 = Higher ed, 5 = Other, 6 = Unknown)
-        "HHBestInkG",   # P – Household disposable-income decile (1 = Lowest 10 %, … 10 = Highest 10 %, 11 = Unknown)
-        "HHGestInkG",   # P – Standardised household income decile (same scale as above)
-        "HHLaagInk",    # P – Deviation from low-income threshold (1 ≤ 80 %, … 8 ≥ 110 %, 9 = Unknown)
-        "HHSocInk",     # P – Deviation from social-minimum (1 ≤ 101 %, … 9 ≥ 150 %, 10 = Unknown)
-        "HHWelvG",      # P – Household wealth decile (1 = Lowest 10 %, … 10 = Highest 10 %, 11 = Unknown)
-        "KBouwjaarPa1", "KBouwjaarPa2", "KBouwjaarPaL",  # P – Model-year class car (1 ≤ 2010, … 7 = 2022, 8 = Unknown, 9 = N/A)
-        "KGewichtPa1", "KGewichtPa2", "KGewichtPaL",     # P – Weight class car (1 < 951 kg, … 5 > 1550 kg, 6 = Unknown, 7 = N/A)
-        "HHBezitVm",    # P – Household vehicle-ownership class (0 = None, 1 = ≥3 cars, 2 = 2 cars, 3 = 1 car, 4 = ≥1 motorcycle, 5 = ≥1 moped, 6 = ≥1 light-moped, 7 = ≥1 e-bike, 8 = Unknown)
-        "OPBezitVm",    # P – Respondent’s vehicle-ownership class (same coding as above)
-        "FqLopen", "FqNEFiets", "FqEFiets", "FqBTM", "FqTrein",
-        "FqAutoB", "FqAutoP", "FqMotor", "FqBrSnor",       # P – Travel frequency (1 = Daily, 2 = Few/week, 3 = Few/month, 4 = Few/year, 5 = Never)
-        "OVStKaart",    # P – Holds student OV-chip card (0 = No, 1 = Week, 2 = Weekend, 3 = Unknown, 4 = N/A)
-        "WrkVervw",     # P – Main commute mode by km (1 = Walk, 2 = Bike/e-bike, 3 = Moped, 4 = Car, 5 = Van, 6 = Motorcycle, 7 = Train, 8 = Bus/Tram/Metro, 9 = Other, 10 = Unknown)
-        "WrkVerg", "VergVast", "VergKm", "VergBrSt", "VergOV",
-        "VergAans", "VergVoer", "VergBudg", "VergPark", "VergStal", "VergAnd",   # P – Employer reimbursements (0 = No, 1 = Yes, 2 = N/A)
-        "Weggeweest",   # P – Was away yesterday? (0 = No, 1 = Yes, 6 = Series trip, 7 = Work truck, 8 = Work truck series)
-        "RedenNW", "RedenNWZ", "RedenNWW", "RedenNWB",   # P – Reasons for not travelling (see full codes)
-        "AantVpl", "AantOVVpl", "AantSVpl",              # P – Trip counts (0 = None, 1‥25)
-        "EFiets",        # P – Type of e-bike used (0 = N/A, 1 = E-bike, 2 = Speed-pedelec, 3 = Both, 4 = Unknown)
-        "AutoEig", "AutoHhl", "AutoLWg", "AutoLPl", "AutoBed",
-        "AutoDOrg", "AutoDPart",                         # P – Car source flags (0 = N/A, 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-        "KAfstV",      # V – Trip distance class NL (0 = None, 1 = 0.1-0.5 km … 15 = ≥100 km)
-        "KVertTijd",   # V – Departure-time class (1 = 0-4 h, 2 = 4-7 h, … 13 = 20-24 h)
-        "KReisduur",   # V – Travel-time class NL (0 = None, 1 = 1-5 min, … 11 = ≥120 min)
-        "VolgWerk",    # V – Sequence of work trips (1 = Stand-alone, 2 = 1st-of-2, 3 = 2nd-of-2, … 9 = Not work)
-        "KMotiefV",    # V – Motive group (1 = Commute, 2 = Business, 3 = Services, 4 = Shopping, … 9 = Other)
-        "MeerWink",    # V – Multiple shops visited (0 = No, 1 = Yes, 2 = Unknown, 3 = N/A)
-        "AardWerk",    # V – Kind of work (1 = Construction, 2 = Service, 3 = Delivery, 4 = Goods transport, 5 = Passenger transport, 6 = Care, 7 = Emergency, 8 = Business, 9 = Collection, 10 = Other, 11 = Unknown, 12 = N/A)
-        "KAfstR",      # R – Ride distance class NL (0 = None, 1 = 0.1-0.5 km … 15 = ≥100 km)
-        "KRvm",        # R – Ride mode class (1 = Car-driver, 2 = Car-passenger, 3 = Train, 4 = BTM, 5 = Bicycle, 6 = Walk, 7 = Other)
-        "KHvm",        # V – Trip mode class (same coding as KRvm)
-        # — Reachability & reason scales already partly listed; add missing twins —
-        "BerHalte", "RdHalteA", "RdHalteB",
-        "BerFam",  "RdFamA",   "RdFamB",
-        "BerSport","RdSportA", "RdSportB",
-        "BerWrk",  "RdWrkA",   "RdWrkB",
-        "BerOnd",  "RdOndA",   "RdOndB",
-        "BerSup",  "RdSupA",   "RdSupB",
-        "BerZiek", "RdZiekA",  "RdZiekB",
-        "BerArts", "RdArtsA",  "RdArtsB",
-        "BerStat", "RdStatA",  "RdStatB",
-        # — Daily-pattern flags —
-        "ByzDag","ByzAdr","ByzVvm","ByzTyd","ByzDuur","ByzRoute","ByzReden",
+
+        # ── Household characteristics ──
+        "HHSam",        # P – Household composition (1 Single, 2 Couple, 3 Couple + child(ren), 4 Couple + child(ren) + others, 5 Couple + others, 6 Single-parent + child(ren), 7 Single-parent + child(ren) + others, 8 Other, 9 Unknown)
+        "HHPlOP",       # P – Respondent’s position in household (1 Single, 2 Household core, 3 Partner, 4 Child, 5 Other member, 6 Unknown)
+        "Sted",         # P – Urbanisation class (1 Very strongly urban, 2 Strongly urban, 3 Moderately urban, 4 Slightly urban, 5 Not urban)
+        "GemGr",        # P – Municipality size class (1 < 5 k, 2 5–10 k, 3 10–20 k, 4 20–50 k, 5 50–100 k, 6 100–150 k, 7 150–250 k, 8 ≥ 250 k)
+        "Prov",         # P – Province of residence (1 Groningen … 12 Limburg)
+        "MRA",          # P – Amsterdam metro-region zone (1 Centre … 21 Rest NL)
+        "MRDH",         # P – Rotterdam/The Hague metro-region zone (1 The Hague-Centre … 18 Rest NL)
+        "Utr",          # P – Utrecht provincial sub-region (1 De Ronde Venen & Stichtse Vecht … 21 Rest NL)
+        "Herkomst",     # P – Migration background (1 Dutch, 2 Western, 3 Non-Western, 4 Unknown)
+
+        # ── Household characteristics ──
+        "HHSam",        # P – Household composition (1 Single, 2 Couple, 3 Couple + child(ren), 4 Couple + child(ren) + others, 5 Couple + others, 6 Single-parent + child(ren), 7 Single-parent + child(ren) + others, 8 Other, 9 Unknown)
+        "HHPlOP",       # P – Respondent’s position in household (1 Single, 2 Household core, 3 Partner, 4 Child, 5 Other member, 6 Unknown)
+        "Sted",         # P – Urbanisation class (1 Very strongly urban, 2 Strongly urban, 3 Moderately urban, 4 Slightly urban, 5 Not urban)
+        "GemGr",        # P – Municipality size class (1 < 5 k, 2 5–10 k, 3 10–20 k, 4 20–50 k, 5 50–100 k, 6 100–150 k, 7 150–250 k, 8 ≥ 250 k)
+        "Prov",         # P – Province of residence (1 Groningen … 12 Limburg)
+        "MRA",          # P – Amsterdam metro-region zone (1 Centre … 21 Rest NL)
+        "MRDH",         # P – Rotterdam/The Hague metro-region zone (1 The Hague-Centre … 18 Rest NL)
+        "Utr",          # P – Utrecht provincial sub-region (1 De Ronde Venen & Stichtse Vecht … 21 Rest NL)
+        "Herkomst",     # P – Migration background (1 Dutch, 2 Western, 3 Non-Western, 4 Unknown)
+
+        # ── Work & education ──
+        "BetWerk",      # P – Paid work (0 None, 1 < 12 h, 2 12–30 h, 3 ≥ 30 h, 4 Unknown, 5 Not asked (<15 y))
+        "OnbBez",       # P – Unpaid activity (1 Homemaker, 2 Retired, 3 Student, 4 Disabled, 5 Unemployed, 6 Unpaid-worker, 7 Other, 8 Unknown)
+        "MaatsPart",    # P – Social-participation class (1 12–30 h work, 2 ≥ 30 h work, 3 Own household, 4 Student, 5 Unemployed, 6 Disabled, 7 Retired, 8 Other, 9 Unknown)
+        "Opleiding",    # P – Highest completed education (0 None, 1 Primary, 2 Lower vocational, 3 Upper sec / VET, 4 Higher ed, 5 Other, 6 Unknown)
+
+        # ── Car characteristics ──
+        "KBouwjaarPa1", "KBouwjaarPa2", "KBouwjaarPaL",  # P – Car model-year class (1 ≤ 2010, 2 2011-13, 3 2014-16, 4 2017-19, 5 2020, 6 2021, 7 2022, 8 Unknown, 9 N/A)
+        "KGewichtPa1", "KGewichtPa2", "KGewichtPaL",     # P – Car weight class (1 < 951 kg, 2 951-1150, 3 1151-1350, 4 1351-1550, 5 > 1550, 6 Unknown, 7 N/A)
+
+        # ── Vehicle ownership ──
+        "HHBezitVm",    # P – Household vehicle possession (0 None, 1 ≥ 3 cars, 2 2 cars, 3 1 car, 4 ≥ 1 motor, 5 ≥ 1 moped, 6 ≥ 1 light-moped, 7 ≥ 1 e-bike, 8 Unknown)
+        "OPBezitVm",    # P – Respondent’s vehicle possession (same coding as HHBezitVm)
+
+        # ── Travel frequency ──
+        "FqLopen",  # P – Walk outdoors (1 Daily, 2 Few/week, 3 Few/month, 4 Few/year, 5 Never)
+        "FqNEFiets",# P – Conventional bicycle (same 1–5 codes)
+        "FqEFiets", # P – E-bike / speed-pedelec (1–5)
+        "FqBTM",    # P – Bus-tram-metro (1–5)
+        "FqTrein",  # P – Train (1–5)
+        "FqAutoB",  # P – Car as driver (1–5, 6 N/A < 17 y)
+        "FqAutoP",  # P – Car as passenger (1–5)
+        "FqMotor",  # P – Motorcycle (1–5)
+        "FqBrSnor", # P – Moped / light-moped (1–5)
+
+        # ── Public-transport entitlement ──
+        "OVStKaart",    # P – Holds student OV-chip card (0 No, 1 Week, 2 Weekend, 3 Unknown, 4 N/A < 15 y or > 40 y)
+
+        # ── Work commute & employer support ──
+        "WrkVervw",     # P – Main commute mode by km (1 Walk, 2 Bicycle/e-bike, 3 Moped, 4 Car, 5 Van, 6 Motorcycle, 7 Train, 8 Bus/Tram/Metro, 9 Other, 10 Unknown, 11 WFH only, 12 No paid work, 13 < 15 y)
+        "WrkVerg",      # P – Any travel cost reimbursement (0 No, 1 Yes, 2 Unknown, 3 N/A)
+        "VergVast", "VergKm", "VergBrSt", "VergOV",         # P – Type of reimbursement: flat amount / per-km / fuel / public transport (0 No, 1 Yes, 2 N/A)
+        "VergAans", "VergVoer", "VergBudg", "VergPark", "VergStal", "VergAnd",  # P – Reimb. for purchase / lease vehicle / mobility budget / parking / bicycle storage / other (0 No, 1 Yes, 2 N/A)
+
+        # ── Daily travel & reasons ──
+        "Weggeweest",   # P – Was away yesterday? (0 No, 1 Yes, 6 Series trip, 7 Work truck trip, 8 Work-truck series)
+        "RedenNW",      # P – Reason for not travelling (1 Illness/injury, 2 Physical limitation, 3 Weather, 4 Working/studying at home, 5 Home study, 6 Care duties, 7 No out-of-home activity, 8 Too expensive, 9 No transport, 10 Abroad, 11 Other, 12 Unknown, 0 N/A)
+        "RedenNWZ",     # P – Illness duration (1 1–6 days, 2 7 days–4 weeks, 3 > 4 weeks, 4 Unknown, 0 N/A, 5 N/A other reason)
+        "RedenNWW",     # P – Type of bad weather (1 Cold, 2 Heat, 3 Precipitation, 4 Wind/storm, 5 Ice, 6 Fog, 7 Changeable, 8 Other, 9 Unknown, 0 N/A, 10 N/A other reason)
+        "RedenNWB",     # P – Purpose of stay abroad (1 Leisure/holiday, 2 Work, 3 Study, 4 Family visit, 5 Other, 6 Unknown, 0 N/A, 7 N/A other reason)
+
+        # ── Trip counts & e-bike type ──
+        "AantVpl",  # P – Regular trips in NL (0 None, 1–25)
+        "AantOVVpl",# P – Regular public-transport trips (0 None, 1–25)
+        "AantSVpl", # P – Series trips (0 None, 1–25)
+        "EFiets",   # P – Type of e-bike used (0 N/A, 1 E-bike, 2 Speed-pedelec, 3 Both, 4 Unknown, 5 Not asked/no e-bike)
+
+        # ── Car-usage source flags ──
+        "AutoEig",  # P – Used own car (0 N/A, 1 Yes, 2 No, 3 Unknown, 4 Not asked)
+        "AutoHhl",  # P – Used household member’s car (same coding)
+        "AutoLWg",  # P – Used employer lease-car
+        "AutoLPl",  # P – Used private-lease car
+        "AutoBed",  # P – Used company-registered car
+        "AutoDOrg", # P – Used organisation car-share
+        "AutoDPart",# P – Used peer-to-peer shared car
+
+        # ── Trip-level classes ──
+        "KAfstV",   # V – Trip distance class NL (0 None, 1 0.1-0.5 km, 2 0.5-1 km, 3 1-2.5 km, 4 2.5-3.7 km, 5 3.7-5 km, 6 5-7.5 km, 7 7.5-10 km, 8 10-15 km, 9 15-20 km, 10 20-30 km, 11 30-40 km, 12 40-50 km, 13 50-75 km, 14 75-100 km, 15 ≥ 100 km)
+        "KVertTijd",# V – Departure-time class (1 00:00-04:00, 2 04:00-07:00, 3 07:00-08:00, 4 08:00-09:00, 5 09:00-12:00, 6 12:00-13:00, 7 13:00-14:00, 8 14:00-16:00, 9 16:00-17:00, 10 17:00-18:00, 11 18:00-19:00, 12 19:00-20:00, 13 20:00-24:00)
+        "KReisduur",# V – Travel-time class NL (0 None, 1 1-5 min, 2 5-10, 3 10-15, 4 15-20, 5 20-25, 6 25-30, 7 30-45, 8 45-60, 9 60-90, 10 90-120, 11 ≥ 120)
+        "VolgWerk", # V – Sequence of work trips (1 Stand-alone work trip, 2 1st of 2, 3 2nd of 2, 4 1st of 3, 5 2nd of 3, 6 3rd of 3, 7 1st of series-followed trips, 8 Series work trip, 9 N/A – not work)
+        "KMotiefV", # V – Motive group (1 Commute, 2 Business, 3 Services/personal, 4 Shopping, 5 Education, 6 Visit, 7 Other social/leisure, 8 Touring/walking, 9 Other)
+        "MeerWink", # V – Multiple shops visited (0 No, 1 Yes, 2 Unknown, 3 N/A – no shopping)
+        "AardWerk", # V – Nature of work (1 Construction, 2 Service, 3 Delivery, 4 Goods-transport, 5 Passenger-transport, 6 Care, 7 Emergency, 8 Business, 9 Collection, 10 Other, 11 Unknown, 12 N/A)
+        "KAfstR",   # R – Ride distance class NL (0 None, 1 0.1-0.5 km … 15 ≥ 100 km)
+        "KRvm",     # R – Ride mode class (1 Car-driver, 2 Car-passenger, 3 Train, 4 Bus/Tram/Metro, 5 Bicycle, 6 Walk, 7 Other)
+        "KHvm",     # V – Trip mode class (same coding as KRvm)
+
+        # ── Reachability & reason scales ──
+        "BerHalte",  # P – Bus / tram / metro stop: how often reachable? (1 Always, 2 Often, 3 Sometimes, 4 Seldom, 5 Never, 6 Unknown, 7 Not applicable – never needs to go, 8 N/A < 15 y)
+        "RdHalteA",  # P – Reason A stop not always reachable (1 No own transport, 2 Cannot/will-not cycle, 3 Cannot/will-not use PT, 4 Cannot/will-not use taxi, 5 Cannot travel alone, 6 Health, 7 Journey too long, 8 Too expensive, 9 Traffic too busy, 10 Feels unsafe, 11 Other, 12 Unknown, 13 N/A (always reachable), 14 N/A (other reason))
+        "RdHalteB",  # P – Reason B stop not always reachable (same code list; 12 = No second reason)
+
+        "BerFam",    # P – Family/friends location: how often reachable? (same 1-8 code list as BerHalte)
+        "RdFamA", "RdFamB",  # P – Reasons A/B family/friends not always reachable (same reason code list)
+
+        "BerSport",  # P – Sport or hobby venue: how often reachable? (1 Always … 8 N/A < 15 y)
+        "RdSportA", "RdSportB",  # P – Reasons A/B sport venue not always reachable
+
+        "BerWrk",  # P – Workplace: how often reachable? (1 Always, 2 Often, 3 Sometimes, 4 Seldom, 5 Never, 6 Unknown, 7 N/A (no need), 8 N/A < 15 y)
+        "RdWrkA", "RdWrkB",  # P – Reasons A/B workplace not always reachable
+
+        "BerOnd",  # P – Education location: how often reachable? (1 Always … 8 N/A < 15 y)
+        "RdOndA", "RdOndB",  # P – Reasons A/B education location not always reachable
+
+        "BerSup",  # P – Supermarket: how often reachable? (1 Always … 8 N/A < 15 y)
+        "RdSupA", "RdSupB",  # P – Reasons A/B supermarket not always reachable
+
+        "BerZiek", # P – Hospital: how often reachable? (1 Always … 8 N/A < 15 y)
+        "RdZiekA", "RdZiekB",  # P – Reasons A/B hospital not always reachable
+
+        "BerArts", # P – GP (doctor): how often reachable? (1 Always … 8 N/A < 15 y)
+        "RdArtsA", "RdArtsB",  # P – Reasons A/B GP not always reachable
+
+        "BerStat", # P – Railway station: how often reachable? (1 Always … 8 N/A < 15 y)
+        "RdStatA", "RdStatB",  # P – Reasons A/B station not always reachable
+
+         # ── Daily-pattern flags ──
+        "ByzDag",    # P – Diary day had special circumstances? (0 N/A (no trips), 1 Yes, 2 No specific events, 3 No – this weekday is always different, 4 Unknown)
+        "ByzAdr",    # P – Special: other addresses visited? (0 N/A, 1 Yes, 2 No, 3 Not asked)
+        "ByzVvm",    # P – Special: other modes used? (0 N/A, 1 Yes, 2 No, 3 Not asked)
+        "ByzTyd",    # P – Special: other times travelled? (0 N/A, 1 Yes, 2 No, 3 Not asked)
+        "ByzDuur",   # P – Special: other travel durations? (0 N/A, 1 Yes, 2 No, 3 Not asked)
+        "ByzRoute",  # P – Special: other routes taken? (0 N/A, 1 Yes, 2 No, 3 Not asked)
+        "ByzReden",  # P – Reason different travel pattern (0 N/A, 1 Day off, 2 Illness, 3 Traffic, 4 Appointments, 5 Ill household-member, 6 Travel together, 7 Luggage, 8 Weather, 9 Other, 10 Unknown, 11 Not asked)
     ]
 
+    # ── CATEGORICAL (35) ───────────────────────────────────────────────────────────
     categorical_cols = [
-        "BrandstofPa1",   # P – Primary fuel newest car (1 = Petrol, 2 = Diesel, 3 = LPG, 4 = Electric, 5 = Other, 6 = Unknown, 7 = N/A)
-        "XBrandstofPa1",  # P – Secondary fuel newest car (0 = None, 1 = Petrol, 2 = Diesel, 3 = LPG, 4 = Electric, 5 = Other, 6 = Unknown, 7 = N/A)
-        "BrandstofEPa1",  # P – Electric drivetrain type newest car (0 = Not electric, 1 = Full EV, 2 = Plug-in hybrid, 3 = Hybrid, 4 = Other, 5 = Unknown, 6 = N/A)
-        "TenaamPa1",      # P – Registered owner newest car (1 = Own name, 2 = Other household member, 3 = N/A)
-        "BrandstofPa2", "XBrandstofPa2", "BrandstofEPa2", "TenaamPa2", # -- same coding for 2nd car
-        "BrandstofPaL", "XBrandstofPaL", "BrandstofEPaL",              # -- same coding lease/company car
-        "Doel", "MotiefV",         # V – Detailed purpose / motive (see 14 & 13-code lists)
-        "VertLoc",                 # V – Departure location type (1 = Home, 2 = Other home, 3 = Work, 4 = Other)
-        "VertGeb", "AankGeb",      # V – Departure / arrival country (0 = NL, 1‥99 see table)
-        "VertGem", "AankGem",      # V – Departure / arrival municipality (14‥1991, 9999 Unknown)
-        "VertProv","AankProv",     # V – Departure / arrival province (0 = Abroad or none, 1‥12 NL provinces, 99 Unknown)
-        "VertCorop","AankCorop",   # V – Departure / arrival COROP region (0 = Abroad or none, 1‥40 list, 99 Unknown)
-        "SPlaats1","SPlaats2","SPlaats3","SPlaats4","SPlaats5",  # V – Place names in series trip (free text / code)
-        "SVvm1","SVvm2","SVvm3","SVvm4",  # V – Up-to-four modes used in a series (1 = Car, … 24 = Other w/o motor, 25 = N/A)
-        "Rvm","Hvm",               # R/V – Detailed ride / main trip mode (1 = Car, 2 = Train, … 24)
-        "HvmRol", "RvmRol",        # Role in mode (1 = Driver, 2 = Passenger, 3 = Unknown, 4 = N/A)
-        "GehBLVer",                # V – Entirely-abroad trip removed (0 = No, 1 = Removed before, 2 = Removed after, 3 = Both ends removed)
-    ]
+        # ── Car fuel & registration (youngest car) ──
+        "BrandstofPa1",   # P – Primary fuel youngest car (1 Petrol, 2 Diesel, 3 LPG, 4 Electric, 5 Other, 6 Unknown, 7 N/A)
+        "XBrandstofPa1",  # P – Secondary fuel youngest car (0 None, 1 Petrol, 2 Diesel, 3 LPG, 4 Electric, 5 Other, 6 Unknown, 7 N/A)
+        "BrandstofEPa1",  # P – Electric-drive type youngest car (0 Not electric, 1 Full-EV, 2 Plug-in hybrid, 3 Hybrid charge-in-use, 4 Other, 5 Unknown, 6 N/A)
+        "TenaamPa1",      # P – Registered owner youngest car (1 Own name, 2 Other household member, 3 N/A)
 
+        # ── Car fuel & registration (2nd car) ──
+        "BrandstofPa2",   # P – Primary fuel 2nd car (1 Petrol … 6 Unknown, 7 N/A)
+        "XBrandstofPa2",  # P – Secondary fuel 2nd car (0 None … 6 Unknown, 7 N/A)
+        "BrandstofEPa2",  # P – Electric drive type 2nd car (0 Not electric … 6 N/A)
+        "TenaamPa2",      # P – Registered owner 2nd car (1 Own, 2 Other household member, 3 N/A)
+
+        # ── Car fuel & registration (lease / company car) ──
+        "BrandstofPaL",   # P – Primary fuel lease / company car (1 Petrol … 6 Unknown, 7 N/A)
+        "XBrandstofPaL",  # P – Secondary fuel lease / company car (0 None … 6 Unknown, 7 N/A)
+        "BrandstofEPaL",  # P – Electric drive type lease / company car (0 Not electric … 6 N/A)
+
+        # ── Trip purpose / motive ──
+        "Doel",    # V – Trip destination purpose (1 Home, 2 Work, 3 Business visit, 4 Occupational, 5 Pick-up/bring persons, 6 Pick-up/bring goods, 7 Education, 8 Shopping, 9 Visit, 10 Touring/walk, 11 Sport/hobby, 12 Other leisure, 13 Personal services, 14 Other)
+        "MotiefV", # V – Trip motive (1 Commute, 2 Business visit, 3 Occupational, 4 Pick-up persons, 5 Goods, 6 Education, 7 Shopping, 8 Visit, 9 Touring, 10 Sport/hobby, 11 Other leisure, 12 Personal services, 13 Other)
+
+        # ── Location type & codes ──
+        "VertLoc",  # V – Departure location type (1 Home, 2 Other home, 3 Work, 4 Other)
+        "VertGeb", "AankGeb",   # V – Country/area code (0 NL, 1–99 foreign area list)
+        "VertGem", "AankGem",   # V – Municipality code (14–1991 list, 9999 Unknown)
+        "VertProv","AankProv",  # V – Province code (0 Abroad/none, 1–12 NL, 99 Unknown)
+        "VertCorop","AankCorop",# V – COROP region code (0 Abroad/none, 1–40 list, 99 Unknown)
+
+        # ── Series-trip free-text place names ──
+        "SPlaats1","SPlaats2","SPlaats3","SPlaats4","SPlaats5",  # V – Place name 1–5 (string or <none responded>)
+
+        # ── Modes within a series trip ──
+        "SVvm1","SVvm2","SVvm3","SVvm4",  # V – 1st–4th mode in series (1 Car, 2 Train, … 24 Other-no-motor, 25 N/A)
+
+        # ── Detailed modes & roles ──
+        "Rvm","Hvm",         # R/V – Detailed ride / main trip mode (1 Car, 2 Train, … 24 Other-no-motor)
+        "HvmRol", "RvmRol",  # R/V – Role in mode (1 Driver, 2 Passenger, 3 Unknown, 4 N/A)
+
+        # ── Data-cleaning flag ──
+        "GehBLVer",          # V – Entirely-abroad trip removed (0 No, 1 Removed before, 2 Removed after, 3 Both)
+    ]
 
     drop_cols = [
         "OP",        # P – New-person row flag (0 = No new person, 1 = New person)
