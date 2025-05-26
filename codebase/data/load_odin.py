@@ -61,81 +61,129 @@ def load_odin_as_ml_dataset(
     odin_excel_path = os.path.join(os.getcwd(), "data", "OdiN 2019-2023", f"OdiN {year}", f"ODiN{year}_Databestand.xlsx")
     df = load_excel(odin_excel_path)
 
-    # ── NUMERICAL (68) ────────────────────────────────────────────────────────────
+    # ── NUMERICAL (69) ────────────────────────────────────────────────────────────
     numerical_cols = [
-        "HHPers",      # P – Number of persons in household (1‥9, 10 = 10 or more, 11 = Unknown)
-        "HHLft1",      # P – Household members < 6 yrs (0‥9, 10 = 10+, 11 = Unknown)
-        "HHLft2",      # P – Household members 6-11 yrs (0‥9, 10 = 10+, 11 = Unknown)
-        "HHLft3",      # P – Household members 12-17 yrs (0‥9, 10 = 10+, 11 = Unknown)
-        "HHLft4",      # P – Household members ≥ 18 yrs (0‥9, 10 = 10+, 11 = Unknown)
-        "WoPC",        # P – Home postal-code (1000‥9999 = Dutch PC)
-        "Leeftijd",    # P – Age of respondent (6‥98, 99 = 99 or older)
-        "HHRijbewijsAu", # P – Car licences in household (0‥8, 9 = ≥9, 10 = Unknown)
-        "HHRijbewijsMo", # P – Motorcycle licences in household (0‥8, 9 = ≥9, 10 = Unknown)
-        "HHRijbewijsBr", # P – Moped licences in household (0‥8, 9 = ≥9, 10 = Unknown)
-        "HHAuto",      # P – Passenger cars in household (0‥8, 9 = ≥9, 10 = Unknown)
-        "HHAutoL",     # P – Leased / company cars in household (0‥8, 9 = ≥9, 10 = Unknown)
-        "OPAuto",      # P – Cars registered to respondent (0‥8, 9 = ≥9, 10 = Unknown)
-        "BouwjaarPa1", # P – Model-year newest car (1885‥2022, 9994 = Unknown, 9995 = N/A)
-        "BouwjaarPa2", # P – Model-year 2nd car        (same coding as above)
-        "BouwjaarPaL", # P – Model-year lease/company car (same coding)
-        "HHMotor",     # P – Motorcycles in household (0‥8, 9 = ≥9, 10 = Unknown)
-        "OPMotor",     # P – Motorcycles on respondent’s name (0‥8, 9 = ≥9, 10 = Unknown)
-        "HHBrom",      # P – Mopeds in household (0‥8, 9 = ≥9, 10 = Unknown)
-        "OPBrom",      # P – Mopeds on respondent’s name (0‥8, 9 = ≥9, 10 = Unknown)
-        "HHSnor",      # P – Light-mopeds in household (0‥8, 9 = ≥9, 10 = Unknown)
-        "OPSnor",      # P – Light-mopeds on respondent’s name (0‥8, 9 = ≥9, 10 = Unknown)
-        "ReisduurOP",   # P – Total travel-time of regular trips (0 = none, 1‥9 999 min)
-        "AfstandOP",    # P – Total distance of regular trips (0 = none, 1‥9 999 999 hm)
-        "AfstandSOP",   # P – Total distance of series trips (0 = none, 1‥9 999 999 hm)
-        "Verpl",        # V – Trip flag (0 = No, 1 = New trip, 6 = Series trip, 7–8 = Work truck)
-        "VerplID",      # V – Unique trip ID (integer key)
-        "VerplNr",      # V – Trip sequence number (1‥25)
-        "AantRit",      # V – Rides (segments) inside trip (1‥15)
-        "VertPC",       # V – Departure postcode NL (1000‥9999; 0 = abroad; 0000 = unknown)
-        "VertPCBL",     # V – Departure postcode BE/DE (foreign: 1000‥9999 / 01000‥99999)
-        "AankPC",       # V – Arrival postcode NL (same coding as VertPC)
-        "AankPCBL",     # V – Arrival postcode BE/DE (same coding as VertPCBL)
-        "PCG",          # V – Dutch border-crossing postcode (0 = none, 1000‥9999, 0000 unknown)
-        "PCBLG",        # V – Foreign border-crossing postcode (0 = none, 1000‥9999 BE, 01000‥99999 DE)
-        "AfstV",        # V – Trip distance NL (0 = none, 1‥99 999 hm)
-        "VertUur", "VertMin",       # V – Departure clock-time (hh 0‥23, mm 0‥59)
-        "AankUur", "AankMin",       # V – Arrival clock-time (hh 0‥47, mm 0‥59)
-        "Reisduur",     # V – Trip travel-time NL (0 = none, 1‥9 999 min)
-        "ActDuur",      # V – Activity duration at destination (0‥9 999 min)
-        "AfstS", "AfstSBL",         # V – Series-trip distance NL / abroad (1‥99 999 hm)
-        "SBegUur", "SBegMin",       # V – Series start-time (hh 0‥23, mm 0‥59)
-        "SEindUur", "SEindMin",     # V – Series end-time (hh 0‥47/99, mm 0‥59/99)
-        "SAantAdr",      # V – Addresses visited in a series (1 = 3, 2 = 4, 3 = 5, 4 = 6–10, 5 = 11–20, 6 = ≥21, 7 = Unknown)
-        "Rit", "RitID", "RitNr",    # R – Ride flag / unique ID / sequence (see codes)
-        "AfstR", "AfstRBL",         # R – Ride distance NL / abroad (hectometers)
-        "RAantIn",       # R – Occupants in car (1‥8, 9 = ≥9, 10 = Unknown, 11 = N/A)
-        "RVertUur", "RVertMin",     # R – Ride departure time (hh 0‥47, mm 0‥59)
-        "RAankUur", "RAankMin",     # R – Ride arrival time  (hh 0‥47/99, mm 0‥59/99)
-        "RReisduur", "RReisduurBL", # R – Ride travel-time NL / abroad (0 = none, 1‥9 999 min)
-        "RVertStat", "RAankStat",   # R – Rail station codes (000 = N/A, 001‥997 list, 998 = Other, 999 = Unknown)
-        "RTSamen",       # R – Train party size (1‥8, 9 = 9-12, 10 = 12-20, 11 = ≥20, 12 = Unknown, 13 = N/A)
-        "RCorrSnelh",    # R – Speed correction flag (0 = No, 1 = Dist↓, 2 = Time↑, 3 = Dist↓+Time↑, 4 = Dist↑, 5 = Time↓, 6 = Dist↑+Time↓)
-        "RVliegVer",     # R – Flight leg removed (0 = No, 1 = Before, 2 = After, 3 = Both)
-        "FactorH", "FactorP", "FactorV",  # W – Weight factors (floating-point)
-    ]
-    # 22 numerical variables
+        # ── Household composition ──────────────────────────────────────────
+        "HHPers",         # P – Persons in household (1‥9, 10 = ≥10, 11 = Unknown)
+        "HHLft1",         # P – Household members < 6 yrs  (0‥9, 10 = ≥10, 11 = Unknown)
+        "HHLft2",         # P – Household members 6–11 yrs (0‥9, 10 = ≥10, 11 = Unknown)
+        "HHLft3",         # P – Household members 12–17 yrs (0‥9, 10 = ≥10, 11 = Unknown)
+        "HHLft4",         # P – Household members ≥ 18 yrs (0‥9, 10 = ≥10, 11 = Unknown)
+        "Leeftijd",       # P – Age of respondent (6‥98, 99 = 99 yrs or older)
 
-    # ── BINARY (12) ────────────────────────────────────────────────────────────────
+        # ── Household vehicle / licence counts ─────────────────────────────
+        "HHRijbewijsAu",  # P – Car licences in household (0‥8, 9 = ≥9, 10 = Unknown)
+        "HHRijbewijsMo",  # P – Motorcycle licences in household
+        "HHRijbewijsBr",  # P – Moped licences in household
+        "HHFiets",        # P – Bicycles in household (0‥8, 9 = ≥9, 10 = Unknown)
+        "HHAuto",         # P – Passenger cars in household (0‥8, 9 = ≥9, 10 = Unknown)
+        "HHAutoL",        # P – Lease / company cars in household
+        "OPAuto",         # P – Cars on respondent’s name
+        "HHMotor",        # P – Motorcycles in household
+        "OPMotor",        # P – Motorcycles on respondent’s name
+        "HHBrom",         # P – Mopeds in household
+        "OPBrom",         # P – Mopeds on respondent’s name
+        "HHSnor",         # P – Light-mopeds in household
+        "OPSnor",         # P – Light-mopeds on respondent’s name
+
+        # ── Vehicle characteristics ────────────────────────────────────────
+        "BouwjaarPa1",    # P – Model-year newest car (1885‥2022, 9994 Unknown, 9995 N/A)
+        "BouwjaarPa2",    # P – Model-year 2nd car   (same coding)
+        "BouwjaarPaL",    # P – Model-year lease/company car (same coding)
+
+        # ── Person-level travel totals (yesterday) ─────────────────────────
+        "ReisduurOP",     # P – Total travel-time regular trips (min)
+        "AfstandOP",      # P – Total distance regular trips (hectometres)
+        "AfstandSOP",     # P – Total distance series trips (hectometres)
+
+        # ── Trip-level identifiers & flags (V-level) ───────────────────────
+        "Verpl",          # V – Trip flag (0 No, 1 New, 6 Series, 7–8 Work-truck)
+        "VerplID",        # V – Unique trip ID
+        "VerplNr",        # V – Trip sequence number (1‥25)
+        "AantRit",        # V – Number of rides in trip (1‥15)
+
+        # ── Trip-level spatial codes ───────────────────────────────────────
+        "VertPC",         # V – Departure postcode NL (1000‥9999; 0 abroad; 0000 unk.)
+        "VertPCBL",       # V – Departure postcode BE/DE (foreign)
+        "AankPC",         # V – Arrival postcode NL
+        "AankPCBL",       # V – Arrival postcode BE/DE
+        "PCG",            # V – Dutch border-crossing postcode
+        "PCBLG",          # V – Foreign border-crossing postcode
+
+        # ── Trip-level distances & times (V) ───────────────────────────────
+        "AfstV",          # V – Trip distance NL (hectometres)
+        "VertUur",        # V – Departure hour (0‥23)
+        "VertMin",        # V – Departure minute (0‥59)
+        "AankUur",        # V – Arrival hour  (0‥47)
+        "AankMin",        # V – Arrival minute (0‥59)
+        "Reisduur",       # V – Trip travel-time NL (min)
+        "ActDuur",        # V – Activity duration at destination (min)
+
+        # ── Series-trip metrics (V) ────────────────────────────────────────
+        "AfstS",          # V – Series-trip distance NL (hectometres)
+        "AfstSBL",        # V – Series-trip distance abroad (hectometres)
+        "SBegUur",        # V – Series start hour (0‥23)
+        "SBegMin",        # V – Series start minute (0‥59)
+        "SEindUur",       # V – Series end hour (0‥47, 99 = Unknown)
+        "SEindMin",       # V – Series end minute (0‥59, 99 = Unknown)
+        "SAantAdr",       # V – Addresses visited in series (1 = 3, 2 = 4, 3 = 5, 4 = 6–10, 5 = 11–20, 6 = ≥21, 7 = Unknown)
+
+        # ── Ride-level identifiers & flags (R-level) ───────────────────────
+        "Rit",            # R – Ride flag (1 New ride, 3 Foreign ride, 7 Work-truck ride)
+        "RitID",          # R – Unique ride ID
+        "RitNr",          # R – Ride sequence in trip (1‥15)
+
+        # ── Ride-level distances & times (R) ───────────────────────────────
+        "AfstR",          # R – Ride distance NL (hectometres)
+        "AfstRBL",        # R – Ride distance abroad (hectometres)
+        "RAantIn",        # R – Occupants in car (1‥8, 9 = ≥9, 10 Unknown, 11 N/A)
+        "RVertUur",       # R – Ride departure hour (0‥47)
+        "RVertMin",       # R – Ride departure minute (0‥59)
+        "RAankUur",       # R – Ride arrival hour  (0‥47, 99 Unknown)
+        "RAankMin",       # R – Ride arrival minute (0‥59, 99 Unknown)
+        "RReisduur",      # R – Ride travel-time NL (min)
+        "RReisduurBL",    # R – Ride travel-time abroad (min)
+        "RVertStat",      # R – Departure rail-station code (000 N/A)
+        "RAankStat",      # R – Arrival rail-station code   (000 N/A)
+        "RTSamen",        # R – Train party size (1‥8, 9 = 9-12, 10 = 12-20, 11 = ≥20, 12 = Unknown, 13 = N/A)
+        "RCorrSnelh",     # R – Speed-correction flag (0 No, 1 Dist↓, 2 Time↑, 3 Dist↓+Time↑, 4 Dist↑, 5 Time↓, 6 Dist↑+Time↓)
+        "RVliegVer",      # R – Flight leg removed (0 No, 1 Before, 2 After, 3 Both)
+
+        # ── Expansion weights (W-level) ────────────────────────────────────
+        "FactorH",        # W – Household weight factor
+        "FactorP",        # W – Person weight factor
+        "FactorV",        # W – Trip weight factor
+    ]
+
+
+    # ── BINARY (15) ────────────────────────────────────────────────────────────────
     binary_cols = [
-        "OPRijbewijsAu", # P – Respondent holds car licence (0 = No, 1 = Yes, 2 = Unknown)
-        "OPRijbewijsMo", # P – Respondent holds motorcycle licence (0 = No, 1 = Yes, 2 = Unknown)
-        "OPRijbewijsBr", # P – Respondent holds moped licence (0 = No, 1 = Yes, 2 = Unknown)
-        "HHEFiets",      # P – E-bike present in household (0 = No, 1 = Yes, 2 = Unknown)
-        "Kind6",        # V – Child(ren) under 6 travelling along (0 = No, 1 = Yes, 2 = Unknown)
-        "CorrVerpl",    # V – Trip split into rides by editor (0 = No, 1 = Yes)
-        "SDezPlts",     # V – All series addresses in same place (0 = No, 1 = Yes)
-        "Toer",         # V – Round-trip flag (0 = No, 1 = Yes)
-        "VertMRA", "VertMRDH", "VertUtr",  # V – Departure in MRA/MRDH/Utrecht? (0 = No, 1 = Zone code > 0)
-        "AankMRA", "AankMRDH", "AankUtr",  # V – Arrival in same metro regions (same coding)
-    ]
+        # ── Personal licence ownership ──
+        "OPRijbewijsAu",   # P – Respondent holds car licence (0 = No, 1 = Yes, 2 = Unknown)
+        "OPRijbewijsMo",   # P – Respondent holds motorcycle licence (0 = No, 1 = Yes, 2 = Unknown)
+        "OPRijbewijsBr",   # P – Respondent holds moped licence (0 = No, 1 = Yes, 2 = Unknown)
 
-    # ───────── ORDINAL COLUMNS (90) ───────────────────────────
+        # ── Household assets ──
+        "HHEFiets",        # P – E-bike present in household (0 = No, 1 = Yes, 2 = Unknown)
+
+        # ── Trip/series flags ──
+        "Kind6",           # V – Child(ren) under 6 travelling along (0 = No, 1 = Yes, 2 = Unknown)
+        "CorrVerpl",       # V – Trip split into rides by editor (0 = No, 1 = Yes)
+        "SDezPlts",        # V – All series addresses in same place (0 = No, 1 = Yes)
+        "Toer",            # V – Round-trip flag (0 = No, 1 = Yes)
+
+        # ── Departure region flags ──
+        "VertMRA",         # V – Departure in MRA (0 = No, 1 = Zone code > 0)
+        "VertMRDH",        # V – Departure in MRDH (0 = No, 1 = Zone code > 0)
+        "VertUtr",         # V – Departure in Utrecht region (0 = No, 1 = Zone code > 0)
+
+        # ── Arrival region flags ──
+        "AankMRA",         # V – Arrival in MRA (0 = No, 1 = Zone code > 0)
+        "AankMRDH",        # V – Arrival in MRDH (0 = No, 1 = Zone code > 0)
+        "AankUtr",         # V – Arrival in Utrecht region (0 = No, 1 = Zone code > 0)
+    ]
+    
+
     # ── ORDINAL (128) ──────────────────────────────────────────────────────────────
     ordinal_cols = [
         "HHSam",        # P – Household composition (1 = Single, 2 = Couple, 3 = Couple + children, 4 = Couple + children + others, 5 = Couple + others, 6 = Single-parent + children, 7 = Single-parent + children + others, 8 = Other, 9 = Unknown)
@@ -166,15 +214,6 @@ def load_odin_as_ml_dataset(
         "WrkVervw",     # P – Main commute mode by km (1 = Walk, 2 = Bike/e-bike, 3 = Moped, 4 = Car, 5 = Van, 6 = Motorcycle, 7 = Train, 8 = Bus/Tram/Metro, 9 = Other, 10 = Unknown)
         "WrkVerg", "VergVast", "VergKm", "VergBrSt", "VergOV",
         "VergAans", "VergVoer", "VergBudg", "VergPark", "VergStal", "VergAnd",   # P – Employer reimbursements (0 = No, 1 = Yes, 2 = N/A)
-        "BerWrk", "RdWrkA", "RdWrkB",
-        "BerOnd", "RdOndA", "RdOndB",
-        "BerSup", "RdSupA", "RdSupB",
-        "BerZiek", "RdZiekA", "RdZiekB",
-        "BerArts", "RdArtsA", "RdArtsB",
-        "BerStat", "RdStatA", "RdStatB",
-        "BerHalte", "RdHalteA", "RdHalteB",
-        "BerFam", "RdFamA", "RdFamB",
-        "BerSport", "RdSportA", "RdSportB",
         "Weggeweest",   # P – Was away yesterday? (0 = No, 1 = Yes, 6 = Series trip, 7 = Work truck, 8 = Work truck series)
         "RedenNW", "RedenNWZ", "RedenNWW", "RedenNWB",   # P – Reasons for not travelling (see full codes)
         "AantVpl", "AantOVVpl", "AantSVpl",              # P – Trip counts (0 = None, 1‥25)
@@ -222,6 +261,7 @@ def load_odin_as_ml_dataset(
         "SVvm1","SVvm2","SVvm3","SVvm4",  # V – Up-to-four modes used in a series (1 = Car, … 24 = Other w/o motor, 25 = N/A)
         "Rvm","Hvm",               # R/V – Detailed ride / main trip mode (1 = Car, 2 = Train, … 24)
         "HvmRol", "RvmRol",        # Role in mode (1 = Driver, 2 = Passenger, 3 = Unknown, 4 = N/A)
+        "GehBLVer",                # V – Entirely-abroad trip removed (0 = No, 1 = Removed before, 2 = Removed after, 3 = Both ends removed)
     ]
 
 
@@ -239,6 +279,10 @@ def load_odin_as_ml_dataset(
         "Dag",       # P – Calendar day of the month (1‥31)
         "Weekdag",   # P – Day of week (1 = Sunday, 2 = Monday, 3 = Tuesday, 4 = Wednesday, 5 = Thursday, 6 = Friday, 7 = Saturday)
         "Feestdag",  # P – Diary day is Dutch public holiday (0 = No, 1 = Yes)
+    ]
+
+    dont_know = [
+        "WoPC",        # P – Home postal-code (1000‥9999 = Dutch PC)
     ]
 
 
