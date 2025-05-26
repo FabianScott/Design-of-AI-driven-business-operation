@@ -1,4 +1,9 @@
 demographics_population_column = "a_inw"
+demographics_a_00_14 = "a_00_14"
+demographics_a_15_24 = "a_15_24"
+demographics_a_25_44 = "a_25_44"
+demographics_a_45_64 = "a_45_64"
+demographics_a_65_plus = "a_65_oo"
 demographics_buurt_code_column = "gwb_code"
 punt_travel_time_column = 'reistijd_min'
 punt_buurt_code_column = 'bu_code'
