@@ -226,20 +226,20 @@ def load_odin_as_ml_dataset(
 
 
     drop_cols = [
-    "OP",        # P – New-person row flag (0 = No new person, 1 = New person)
-    "OPID",      # P – Unique ID for each respondent (person key)
-    "Steekproef",# P – Sample indicator (1 = Core survey, 4 = Extra North-Wing, 6 = Extra Rotterdam-The Hague, 8 = Extra Utrecht)
-    "Mode",      # P – Response mode (1 = CAWI – web; other modes not used in 2022)
-    "Corop",     # P – COROP region of residence (1 = East Groningen, 2 = Rest Groningen, … 40 = Flevoland)
-    "BuurtAdam", # P – Amsterdam neighbourhood combo (0 = Not Amsterdam resident, 036300–036399 = 100+ neighbourhood codes)
-    "KLeeft",    # P – Age class (2 = 6–11 y, 3 = 12–14 y, 4 = 15–17 y, 5 = 18–19 y, 6 = 20–24 y, 7 = 25–29 y, 8 = 30–34 y, 9 = 35–39 y, 10 = 40–44 y, 11 = 45–49 y)
-    "Jaar",      # P – Reporting year (2022)
-    "Maand",     # P – Reporting month (1 = Jan … 12 = Dec)
-    "Week",      # P – ISO week number of diary day (1‥53)
-    "Dag",       # P – Calendar day of the month (1‥31)
-    "Weekdag",   # P – Day of week (1 = Sunday, 2 = Monday, 3 = Tuesday, 4 = Wednesday, 5 = Thursday, 6 = Friday, 7 = Saturday)
-    "Feestdag",  # P – Diary day is Dutch public holiday (0 = No, 1 = Yes)
-]
+        "OP",        # P – New-person row flag (0 = No new person, 1 = New person)
+        "OPID",      # P – Unique ID for each respondent (person key)
+        "Steekproef",# P – Sample indicator (1 = Core survey, 4 = Extra North-Wing, 6 = Extra Rotterdam-The Hague, 8 = Extra Utrecht)
+        "Mode",      # P – Response mode (1 = CAWI – web; other modes not used in 2022)
+        "Corop",     # P – COROP region of residence (1 = East Groningen, 2 = Rest Groningen, … 40 = Flevoland)
+        "BuurtAdam", # P – Amsterdam neighbourhood combo (0 = Not Amsterdam resident, 036300–036399 = 100+ neighbourhood codes)
+        "KLeeft",    # P – Age class (2 = 6–11 y, 3 = 12–14 y, 4 = 15–17 y, 5 = 18–19 y, 6 = 20–24 y, 7 = 25–29 y, 8 = 30–34 y, 9 = 35–39 y, 10 = 40–44 y, 11 = 45–49 y)
+        "Jaar",      # P – Reporting year (2022)
+        "Maand",     # P – Reporting month (1 = Jan … 12 = Dec)
+        "Week",      # P – ISO week number of diary day (1‥53)
+        "Dag",       # P – Calendar day of the month (1‥31)
+        "Weekdag",   # P – Day of week (1 = Sunday, 2 = Monday, 3 = Tuesday, 4 = Wednesday, 5 = Thursday, 6 = Friday, 7 = Saturday)
+        "Feestdag",  # P – Diary day is Dutch public holiday (0 = No, 1 = Yes)
+    ]
 
 
 
