@@ -1,6 +1,9 @@
 import os
 import numpy as np
 import pandas as pd
+import sys
+
+
 
 from codebase.data.load_demographics import load_excel
 
@@ -382,4 +385,89 @@ def load_odin_as_ml_dataset(
         return X_train, X_val, X_test, y_train, y_val, y_test
     else:
         return X_train, X_test, y_train, y_test
+    
+
+# ---------------------------------------------------------------------------
+# 1.  Put this helper at module level (or in a small utils-file)
+# ---------------------------------------------------------------------------
+import numpy as np
+import pandas as pd
+
+def apply_ignore_rules(df: pd.DataFrame, rules: dict) -> pd.DataFrame:
+    """
+    Replace values that should be ignored by NaN.
+
+    Parameters
+    ----------
+    df     : DataFrame to clean (modified in place and returned)
+    rules  : {col: iterable   -> every element in iterable set to NaN
+              col: callable   -> rows where callable(series) is True set to NaN}
+
+    Returns
+    -------
+    DataFrame  (same object, for chaining)
+    """
+    for col, rule in rules.items():
+        if col not in df.columns:
+            continue                    # just skip missing columns
+        if callable(rule):
+            mask = rule(df[col])
+        else:                           # treat it as a list / set of values
+            mask = df[col].isin(rule)
+        df.loc[mask, col] = np.nan
+    return df
+
+
+# Codes that are 'unknown', 'N/A' or otherwise unusable
+IGNORE_RULES = {
+    # ---- household counters: ignore exactly 11  ---------------------------
+    **{c: [11] for c in ["HHPers", "HHLft1", "HHLft2", "HHLft3", "HHLft4"]},
+
+    # ---- licence / vehicle counters: ignore >=10  -------------------------
+    **{c: (lambda s: s >= 10) for c in [
+            "HHRijbewijsAu","HHRijbewijsMo","HHRijbewijsBr",
+            "HHFiets","HHAuto","HHAutoL","OPAuto","HHMotor",
+            "OPMotor","HHBrom","OPBrom","HHSnor","OPSnor",
+            "RAantIn"]},
+
+    # ---- vehicle year: ignore 9994 and 9995  ------------------------------
+    **{c: [9994, 9995] for c in ["BouwjaarPa1","BouwjaarPa2","BouwjaarPaL"]},
+
+    # ---- 0 means ‘no displacement’: set to NaN so it is treated as missing
+    **{c: [0] for c in [
+            "ReisduurOP","AfstandOP","AfstandSOP","AfstV",
+            "AfstR","AfstRBL","RReisduur","RReisduurBL"]},
+
+    # ----------------------------------------------------------------------
+    # BINARY columns that must be 0/1 only  → everything else ⇒ NaN
+    # ----------------------------------------------------------------------
+    **{c: (lambda s: ~s.isin([0, 1])) for c in [
+            "WrkVerg","MeerWink","OPRijbewijsAu","OPRijbewijsMo",
+            "OPRijbewijsBr","HHEFiets","Kind6","CorrVerpl","SDezPlts",
+            "Toer","VergVast","VergKm","VergBrSt","VergOV",
+            "VergAans","VergVoer","VergBudg","VergPark",
+            "VergStal","VergAnd"]},
+
+    # ----------------------------------------------------------------------
+    # ‘1 = Yes / 2 = No’ blocks  → leave only 1 or 2
+    # ----------------------------------------------------------------------
+    **{c: (lambda s: ~s.isin([1, 2])) for c in [
+            "AutoEig","AutoHhl","AutoLWg","AutoLPl","AutoBed",
+            "AutoDOrg","AutoDPart","AutoDBek","AutoLeen","AutoHuur",
+            "AutoAnd","ByzAdr","ByzVvm","ByzTyd","ByzDuur","ByzRoute"]},
+
+    # ----------------------------------------------------------------------
+    # Ordinal columns with one or a few ‘unknown’ codes
+    # (examples below; extend freely)
+    # ----------------------------------------------------------------------
+    "BetWerk"     : [4, 5],
+    "KBouwjaarPa1": [8, 9],  "KBouwjaarPa2": [8, 9],  "KBouwjaarPaL": [8, 9],
+    "KGewichtPa1" : (lambda s: s >= 6),   # 6,7 are unknown/N.A.
+    "SAantAdr"    : [7],
+    "HHLaagInk"   : [9],
+    "HHSocInk"    : [10],
+    "HHBestInkG"  : [11],  "HHGestInkG": [11],  "HHWelvG": [11],
+    "RTSamen"     : (lambda s: s >= 12),
+}
+
     
