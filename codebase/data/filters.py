@@ -21,8 +21,11 @@ def filter_by_distance_and_duration(df: pd.DataFrame, min_distance, max_distance
 
     Distance is in 100 meters and duration is in minutes.
     """
-    filtered_df = df[(df["AfstV"] >= min_distance) & (df["AfstV"] <= max_distance) &
+    try:
+        filtered_df = df[(df["AfstV"] >= min_distance) & (df["AfstV"] <= max_distance) &
                      (df["Reisduur"] >= min_duration) & (df["Reisduur"] <= max_duration)]
+    except KeyError as e:
+        raise KeyError(f"Column not found in dataframe: {e}. Ensure the dataframe contains 'AfstV' and 'Reisduur' columns.")
     return filtered_df
 
 def filter_by_origin(df: pd.DataFrame, origins, level=0):

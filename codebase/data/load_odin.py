@@ -20,11 +20,13 @@ def make_ml_dataset(df: pd.DataFrame, target_col, drop_cols, categorical_cols=No
         raise ValueError("Cannot use both stratification_col and group_col for splitting.")
 
     # Drop specified columns
-    df_: pd.DataFrame = df.drop(columns=drop_cols)
+    drop_cols_to_use = [col for col in drop_cols if (col in df.columns) and not col == group_col] if drop_cols else []
+    df_: pd.DataFrame = df.drop(columns=drop_cols_to_use, errors='ignore')
 
     # Split the data into features and target
     X = df_.drop(columns=[target_col])
-    X = pd.get_dummies(X, columns=categorical_cols, drop_first=True) if categorical_cols else X
+    categorical_cols_to_use = [col for col in categorical_cols if col in X.columns] if categorical_cols else []
+    X = pd.get_dummies(X, columns=categorical_cols_to_use, drop_first=True)
     y = df_[target_col].isin(target_vals) if target_vals is not None else df_[target_col]
     stratification = df_[stratification_col] if stratification_col else None
 
@@ -32,6 +34,7 @@ def make_ml_dataset(df: pd.DataFrame, target_col, drop_cols, categorical_cols=No
     if group_col:
         gss = GroupShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)
         train_idx, test_idx = next(gss.split(X, y, groups=df_[group_col]))
+        X.drop(columns=[group_col], inplace=True, errors='ignore')
         X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
         y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
     else:
