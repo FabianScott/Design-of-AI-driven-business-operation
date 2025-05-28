@@ -303,6 +303,10 @@ def load_odin_as_ml_dataset(
         "RedenNWZ",             # P – Illness duration (1 1–6 days, 2 7 days–4 weeks, 3 > 4 weeks, 4 Unknown, 0 N/A, 5 N/A other reason)
         "RVliegVer",            # R – Flight leg removed (0 No, 1 Before, 2 After, 3 Both)
         "VolgWerk",             # V – Sequence of work trips (1 Stand-alone work trip, 2 1st of 2, 3 2nd of 2, 4 1st of 3, 5 2nd of 3, 6 3rd of 3, 7 1st of series-followed trips, 8 Series work trip, 9 N/A – not work)
+        "KVertTijd",      # V – Departure-time class (1 00:00-04:00, 2 04:00-07:00, 3 07:00-08:00, 4 08:00-09:00, 5 09:00-12:00, 6 12:00-13:00, 7 13:00-14:00, 8 14:00-16:00, 9 16:00-17:00, 10 17:00-18:00, 11 18:00-19:00, 12 19:00-20:00, 13 20:00-24:00)
+        "VertPC",         # V – Departure postcode NL (1000‥9999; 0 abroad; 0000 unk., <empty> empty in case of no displacement)
+        "AankPC",         # V – Arrival postcode NL (1000‥9999; 0 abroad; 0000 unk., <empty> empty in case of no displacement)
+        "WoPC",           # P – Home postal-code (1000‥9999 = Dutch PC)
     ]
 
 
@@ -328,21 +332,6 @@ def load_odin_as_ml_dataset(
         "RVliegVer",    # R – Flight leg removed (0 No, 1 Before, 2 After, 3 Both)
         "RitNr",        # R – Ride sequence in trip (1‥15) (number of the trip filled in)
         "RitID",        # R – Unique ride ID
-    ]
-
-
-    # Dont know (26)
-    dont_know = [
-        "KVertTijd",      # V – Departure-time class (1 00:00-04:00, 2 04:00-07:00, 3 07:00-08:00, 4 08:00-09:00, 5 09:00-12:00, 6 12:00-13:00, 7 13:00-14:00, 8 14:00-16:00, 9 16:00-17:00, 10 17:00-18:00, 11 18:00-19:00, 12 19:00-20:00, 13 20:00-24:00)
-        "WoPC",           # P – Home postal-code (1000‥9999 = Dutch PC)
-        "Wogem",          # P - Municipality code (14...1991 = Dutch municipality code)
-        "VerplID",        # V – Unique displacement ID (<missing> if not a displacement, id)
-        "VerplNr",        # V – Displacement sequence number (<missing> if not a displacement, 1‥25)
-        "AantRit",        # V – Number of trips in displacement (<missing> if not a displacement or if a serial displacement, 1‥15)
-        "VertPC",         # V – Departure postcode NL (1000‥9999; 0 abroad; 0000 unk., <empty> empty in case of no displacement)
-        "VertPCBL",       # V – Departure postcode abroad ((1000..999) Departure postcode Belgium, (01000..99999) departure postcode Germany, 0000 unknown Belgium, 00000 unknown Germany, 1 Departure in NL, 0 No departure point in Belgium or Germany, <empty> empty if not a displacement)
-        "AankPC",         # V – Arrival postcode NL (1000‥9999; 0 abroad; 0000 unk., <empty> empty in case of no displacement)
-        "AankPCBL",       # V – Arrival postcode abroad ((1000..999) Departure postcode Belgium, (01000..99999) departure postcode Germany, 0000 unknown Belgium, 00000 unknown Germany, 1 Departure in NL, 0 No departure point in Belgium or Germany, <empty> empty if not a displacement)
         "VertUur",        # V – Departure hour (0‥23)
         "VertMin",        # V – Departure minute (0‥59)
         "AankUur",        # V – Arrival hour  (0‥47)
@@ -351,14 +340,25 @@ def load_odin_as_ml_dataset(
         "SBegMin",        # V – Serie displacement start minute (0‥59)
         "SEindUur",       # V – Serie displacement end hour (0‥47, 99 = Unknown)
         "SEindMin",       # V – Serie displacement end minute (0‥59, 99 = Unknown)
+        "VerplID",        # V – Unique displacement ID (<missing> if not a displacement, id)
         "RVertUur",       # R – Ride departure hour (0‥47)
         "RVertMin",       # R – Ride departure minute (0‥59)
         "RAankUur",       # R – Ride arrival hour  (0‥47, 99 Unknown)
         "RAankMin",       # R – Ride arrival minute (0‥59, 99 Unknown)
-        "RCorrSnelh",     # R – Speed-correction flag (0 No, 1 Dist↓, 2 Time↑, 3 Dist↓+Time↑, 4 Dist↑, 5 Time↓, 6 Dist↑+Time↓)
         "RVertStat",      # R – Departure rail-station code (000 N/A)
         "RAankStat",      # R – Arrival rail-station code   (000 N/A)
+        "Wogem",          # P - Municipality code (14...1991 = Dutch municipality code)
+        "VerplNr",        # V – Displacement sequence number (<missing> if not a displacement, 1‥25)
+        "VertPCBL",       # V – Departure postcode abroad ((1000..999) Departure postcode Belgium, (01000..99999) departure postcode Germany, 0000 unknown Belgium, 00000 unknown Germany, 1 Departure in NL, 0 No departure point in Belgium or Germany, <empty> empty if not a displacement)
+        "AankPCBL",       # V – Arrival postcode abroad ((1000..999) Departure postcode Belgium, (01000..99999) departure postcode Germany, 0000 unknown Belgium, 00000 unknown Germany, 1 Departure in NL, 0 No departure point in Belgium or Germany, <empty> empty if not a displacement)
+        "RCorrSnelh",     # R – Speed-correction flag (0 No, 1 Dist↓, 2 Time↑, 3 Dist↓+Time↑, 4 Dist↑, 5 Time↓, 6 Dist↑+Time↓)
         "GehBLVer",       # V – Entirely-abroad trip removed (0 No, 1 Removed before, 2 Removed after, 3 removed before and removed after)
+        "AantRit",        # V – Number of trips in displacement (<missing> if not a displacement or if a serial displacement, 1‥15)
+    ]
+
+
+    # Dont know (26)
+    dont_know = [
     ]
 
     for col in drop_cols:

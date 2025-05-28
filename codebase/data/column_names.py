@@ -23,3 +23,4 @@ id_col = "OPID"                 # ID column in the dataframe
 age_col = "Leeftijd"           # Age column in the dataframe
 urbanness_col = "Sted"       # Urbanity column in the dataframe
 goal_col = "Doel"                # Goal column in the dataframe
+number_of_sub_trips_col = "AantRit"  # Number of sub-trips column in the dataframe

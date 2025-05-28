@@ -11,6 +11,12 @@ from codebase.data.load_odin import make_ml_dataset
 from codebase.data.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_destination, filter_by_motive, transport_modes
 from codebase.data.column_names import transport_mode_col, id_col
 from codebase.plotting.plots import plot_confusion_matrix
+from codebase.data.column_lists import (
+    drop_cols, 
+    numerical_cols,
+    categorical_cols,
+    ordinal_cols
+)
 
 
 def run_multiclass_classification(
@@ -22,8 +28,9 @@ def run_multiclass_classification(
         destinations=None,
         location_level=0,
         motives=None,
-        categorical_features=None,
-        numerical_features=None,
+        categorical_features=categorical_cols,
+        numerical_features=numerical_cols,
+        drop_cols=drop_cols,
         plot=True, 
         savename=None,
         plot_title="Multiclass Classification",
@@ -87,16 +94,13 @@ def run_multiclass_classification(
     X_train, X_test, y_train, y_test = make_ml_dataset(
         df_filtered,
         target_col=transport_mode_col,
-        drop_cols=[col for col in df.columns if col not in [transport_mode_col, id_col] + 
-                   (categorical_features if categorical_features is not None else []) +
-                   (numerical_features if numerical_features is not None else [])],
+        drop_cols=drop_cols,
         categorical_cols=categorical_features,
         test_size=test_size,
         group_col=id_col,
-        )
+    )
     
     
-
     scaler = MinMaxScaler()
     model = RandomForestClassifier(random_state=42, n_jobs=-1, max_depth=10, n_estimators=100, class_weight="balanced") if model is None else model
     pipeline = make_pipeline(scaler, model)
