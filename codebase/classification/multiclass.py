@@ -1,9 +1,11 @@
 import numpy as np
 import pandas as pd
 
+from sklearn.calibration import cross_val_predict
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.base import BaseEstimator
+from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
 
@@ -11,6 +13,13 @@ from codebase.data.load_odin import make_ml_dataset
 from codebase.data.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_destination, filter_by_motive, transport_modes
 from codebase.data.column_names import transport_mode_col, id_col
 from codebase.plotting.plots import plot_confusion_matrix
+from codebase.data.column_lists import (
+    drop_cols, 
+    numerical_cols,
+    categorical_cols,
+    ordinal_cols,
+    binary_cols
+)
 
 
 def run_multiclass_classification(
@@ -22,10 +31,11 @@ def run_multiclass_classification(
         destinations=None,
         location_level=0,
         motives=None,
-        categorical_features=None,
-        numerical_features=None,
+        categorical_features=categorical_cols,
+        drop_cols=drop_cols,
         plot=True, 
         savename=None,
+        verbose=True,
         plot_title="Multiclass Classification",
         ) -> tuple:
     """
@@ -79,26 +89,27 @@ def run_multiclass_classification(
         y_pred : np.ndarray
             The predicted probabilities for the test set.
     """
-    df_filtered = filter_by_distance_and_duration(df, 0, max_dist, 0, np.inf)
-    df_filtered = filter_by_origin(df_filtered, origins, level=location_level) if origins is not None else df_filtered
+
+    df_filtered = filter_by_origin(df, origins, level=location_level) if origins is not None else df
     df_filtered = filter_by_destination(df_filtered, destinations, level=location_level) if destinations else df_filtered
     df_filtered = filter_by_motive(df_filtered, motives) if motives else df_filtered
-
+    try:
+        df_filtered = filter_by_distance_and_duration(df_filtered, 0, max_dist, 0, np.inf)
+    except KeyError as e:
+        print(f"Skip filtering by distance and duration: {e}")
+    
     X_train, X_test, y_train, y_test = make_ml_dataset(
         df_filtered,
         target_col=transport_mode_col,
-        drop_cols=[col for col in df.columns if col not in [transport_mode_col, id_col] + 
-                   (categorical_features if categorical_features is not None else []) +
-                   (numerical_features if numerical_features is not None else [])],
+        drop_cols=drop_cols,
         categorical_cols=categorical_features,
         test_size=test_size,
         group_col=id_col,
-        )
+    )
     
     
-
     scaler = MinMaxScaler()
-    model = RandomForestClassifier(random_state=42, n_jobs=-1, max_depth=10, n_estimators=100, class_weight="balanced") if model is None else model
+    model = RandomForestClassifier(random_state=42, n_jobs=-1, max_depth=10, n_estimators=100, class_weight="balanced", verbose=verbose) if model is None else model
     pipeline = make_pipeline(scaler, model)
     pipeline.fit(X_train, y_train)
     y_pred = pipeline.predict(X_test)

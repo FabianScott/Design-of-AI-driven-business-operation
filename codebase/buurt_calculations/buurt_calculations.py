@@ -149,6 +149,7 @@ def calculate_added_willingness(
         savename=None,
         plot=True,
         col_to_plot="n_extra_inhabitants_now_willing",
+        age_group_column=None,
         ):
     """
     Calculate the added willingness to cycle given a maximum detour factor.
@@ -189,7 +190,8 @@ def calculate_added_willingness(
     
     improvement_mask = df_filtered["willingness_diff_proportion"] > 0
     df_filtered[improvement_column] = 0
-    n_improvement = df_location[demographics_population_column][improvement_mask].values * df_filtered["willingness_diff_proportion"][improvement_mask].values
+    demo_col_to_use = demographics_population_column if age_group_column is None else age_group_column
+    n_improvement = df_location[demo_col_to_use][improvement_mask].values * df_filtered["willingness_diff_proportion"][improvement_mask].values
     df_filtered.loc[improvement_mask, improvement_column] = np.round(n_improvement)
     
     if plot:
