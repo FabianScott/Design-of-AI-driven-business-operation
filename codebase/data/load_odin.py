@@ -8,7 +8,7 @@ import sys
 from codebase.data.load_demographics import load_excel
 
 
-def make_ml_dataset(df: pd.DataFrame, target_col, drop_cols, categorical_cols=None, target_vals=None, test_size=0.2, random_state=42, stratification_col=None, group_col=None) -> tuple:
+def make_ml_dataset(df: pd.DataFrame, target_col, drop_cols, categorical_cols=None, target_vals=None, test_size=0.2, random_state=42, stratification_col=None, group_col=None, y_translation: dict=None) -> tuple:
     """
     Splits the dataset into training and testing sets.
     """
@@ -26,8 +26,11 @@ def make_ml_dataset(df: pd.DataFrame, target_col, drop_cols, categorical_cols=No
     # Split the data into features and target
     X = df_.drop(columns=[target_col])
     categorical_cols_to_use = [col for col in categorical_cols if col in X.columns] if categorical_cols else []
-    X = pd.get_dummies(X, columns=categorical_cols_to_use, drop_first=True)
-    y = df_[target_col].isin(target_vals) if target_vals is not None else df_[target_col]
+    X = pd.get_dummies(X, columns=categorical_cols_to_use, drop_first=True, dtype=np.int64)
+    y: pd.DataFrame = df_[target_col].isin(target_vals) if target_vals is not None else df_[target_col]
+    y = y.astype(np.int64)
+    if y_translation:
+        y = y.map(y_translation).fillna(0).astype(np.int64)
     stratification = df_[stratification_col] if stratification_col else None
 
     # Split the data into training and testing sets

@@ -4,7 +4,6 @@ numerical_cols = [
     # Ignore nothing
     "ActDuur",        # V – Activity duration at destination (min) (0-9999, <missing> missing if not a displacement)
     "Leeftijd",       # P – Age of respondent (6‥98, 99 = 99 yrs or older)
-    "AfstS",          # V – Serie displacement distance NL (hectometres) (1-9999, <missing> missing if not a displacement or if a serial displacement)
     "AantVpl",        # P – Regular trips in NL (0 None, 1–25)
     "AantOVVpl",      # P – Regular public-transport trips (0 None, 1–25)
     "AantSVpl",       # P – Series trips (0 None, 1–25)
@@ -49,8 +48,6 @@ numerical_cols = [
     "AfstandOP",      # P – Total distance regular displacements (hectometres) (0 = no displacements, 1-999999)
     "AfstandSOP",     # P – Total distance series displacements (hectometres) (0 = no displacements, 1-999999)
     "AfstV",          # V – Displacement distance NL (hectometres) (0 No regular displacements in NL, 1..99999, <missing> missing if not a displacement or if a serial displacement)
-    "AfstR",          # R – Trip distance NL (hectometres)  (0 = not a trip in NL, 1-999979 = distance in hectometers, <missing> missing if not a displacement)
-    "AfstRBL",        # R – Trip distance abroad (hectometres) (0 = not a trip abroad, 1-999979 = distance in hectometers, <missing> missing if not a displacement)
     #### ----> Floris: end of ignoring 0
 ]
 
@@ -66,8 +63,6 @@ binary_cols = [
     "HHEFiets",         # P – E-bike present in household (0 = No, 1 = Yes, 2 = Unknown)
     "Kind6",            # V – Child(ren) under 6 travelling along (0 = No, 1 = Yes, 2 = Unknown, <missing> missing if not a displacement or if serial displacement)
     "CorrVerpl",        # V – Trip split into rides by editor (0 = No, 1 = Yes)
-    "SDezPlts",         # V – All series addresses in same place (0 = No, 1 = Yes)
-    "Toer",             # V – Departure point is arrival point? (0 = No, 1 = Yes, <missing> if not a displacement or if a serial displacement)
     "VergVast", "VergKm", "VergBrSt", "VergOV",                             # P – Type of reimbursement: flat amount / per-km / fuel / public transport (0 No, 1 Yes, 2 N/A)
     "VergAans", "VergVoer", "VergBudg", "VergPark", "VergStal", "VergAnd",  # P – Reimbursement for purchase vehicle / lease vehicle / mobility budget / parking / bicycle storage / other (0 No, 1 Yes, 2 N/A)
     #### -----> Floris: end of what should be 0 or 1
@@ -101,7 +96,6 @@ ordinal_cols = [
 
     #### ----> Floris: ignore 0 
     "KAfstV",   # V – Trip distance class NL (0 None (Not NL), 1 0.1-0.5 km, 2 0.5-1 km, 3 1-2.5 km, 4 2.5-3.7 km, 5 3.7-5 km, 6 5-7.5 km, 7 7.5-10 km, 8 10-15 km, 9 15-20 km, 10 20-30 km, 11 30-40 km, 12 40-50 km, 13 50-75 km, 14 75-100 km, 15 ≥ 100 km, <missing> if not a displacement or if a serial displacement)
-    "KAfstR",   # R – Ride distance class NL (0 None, 1 0.1-0.5 km … 15 ≥ 100 km)
     #### ----> Floris: end of ignoring 0
 
     #### ----> Floris: ignore 4 and 5 
@@ -125,9 +119,6 @@ ordinal_cols = [
     "BerStat", # P – Railway station: how often reachable? (1 Always, 2 Often, 3 Sometimes, 4 Seldom, 5 Never, 6 Unknown, 7 N/A (no need), 8 N/A < 15 y)
     #### ----> Floris: end of ignoring >=6
 
-    #### ----> Floris: ignore 7
-    "SAantAdr",     # V – Addresses visited in series (1 = 3, 2 = 4, 3 = 5, 4 = 6–10, 5 = 11–20, 6 = ≥21, 7 = Unknown)
-    #### ----> Floris: end of ignoring 7
 
     #### ----> Floris: ignore 9
     "HHLaagInk",    # P - Deviation from minimal-income lower bound (1 = Income until 80% of minimal income, 2 = Income from 80-85% of minimal income, ... 7 = Income of 105-110% of minimal income, 8 = Income of 110% or higher of minimal income, 9 = Income unknown)
@@ -171,12 +162,25 @@ categorical_cols = [
     "Prov",                 # P – Province of residence (1 Groningen … 12 Limburg)
 ]
 
-"Rvm" # Is target variable, so we ignore it
+"Hvm" # Is target variable, so we ignore it
 # Dropped cols (24)
 drop_cols = [
+ 
+    #### ----> Floris: ignore 7
+    "SAantAdr",     # V – Addresses visited in series (1 = 3, 2 = 4, 3 = 5, 4 = 6–10, 5 = 11–20, 6 = ≥21, 7 = Unknown)
+    #### ----> Floris: end of ignoring 7
+    "SDezPlts",         # V – All series addresses in same place (0 = No, 1 = Yes)
+    "AfstS",          # V – Serie displacement distance NL (hectometres) (1-9999, <missing> missing if not a displacement or if a serial displacement)
+
+    # ── Trip characteristics ────────────────────────────────────────────────
+    "AfstR",          # R – Trip distance NL (hectometres)  (0 = not a trip in NL, 1-999979 = distance in hectometers, <missing> missing if not a displacement)
+    "AfstRBL",        # R – Trip distance abroad (hectometres) (0 = not a trip abroad, 1-999979 = distance in hectometers, <missing> missing if not a displacement)
+    "KAfstR",   # R – Ride distance class NL (0 None, 1 0.1-0.5 km … 15 ≥ 100 km)
+    
+    "Toer",             # V – Departure point is arrival point? (0 = No, 1 = Yes, <missing> if not a displacement or if a serial displacement)
 
     # Confounds with target variable:
-    "Hvm",            # R/V – Detailed ride / main trip mode (1 Car, 2 Train, … 24 Other-no-motor)
+    "Rvm",            # R/V – Detailed ride / main trip mode (1 Car, 2 Train, … 24 Other-no-motor)
     "KHvm",                 # V – Trip mode class (1 Car-driver, 2 Car-passenger, 3 Train, 4 Bus/Tram/Metro, 5 Bicycle, 6 Walk, 7 Other, <missing> missing if not a displacement)
     "EFiets",               # P – Type of e-bike used (0 N/A, 1 E-bike, 2 Speed-pedelec, 3 Both, 4 Unknown, 5 Not asked/no e-bike)
     "WrkVervw",             # P – Transport mode to work with most km's (1 Walk, 2 Bicycle/e-bike, 3 Moped, 4 Car, 5 Van, 6 Motorcycle, 7 Train, 8 Bus/Tram/Metro, 9 Other, 10 Unknown, 11 N/A works from home, 12 N/A No paid work, 13 N/A < 15 y)
