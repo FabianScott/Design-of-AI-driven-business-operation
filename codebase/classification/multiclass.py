@@ -4,10 +4,10 @@ import pandas as pd
 from sklearn.calibration import cross_val_predict
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.base import BaseEstimator
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.pipeline import make_pipeline
+from sklearn.pipeline import Pipeline
 
 from codebase.data.load_odin import make_ml_dataset
 from codebase.data.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_destination, filter_by_motive, transport_modes
@@ -21,7 +21,49 @@ from codebase.data.column_lists import (
     binary_cols
 )
 
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from skorch import NeuralNetClassifier
 
+class SktorchNN(nn.Module):
+    def __init__(self, input_dim, output_dim, n_layers=2, hidden_layers=64):
+        super(SktorchNN, self).__init__()
+        layers = []
+        for size in hidden_layers:
+            layers.append(nn.Linear(input_dim, size))
+            layers.append(nn.ReLU())
+            input_dim = hidden_layers
+        layers.append(nn.Linear(hidden_layers, output_dim))
+        self.network = nn.Sequential(*layers)
+
+    def forward(self, x):
+        return self.network(x)
+    
+def create_sktorch_nn(
+        input_dim: int,
+        output_dim: int,
+        n_layers: int = 2,
+        hidden_layers: list[int] = [64],
+        max_epochs: int = 20,
+        lr: float = 0.01,
+        batch_size: int = 32,
+        optimizer: str = 'adam',
+        criterion: str = 'cross_entropy',
+) -> NeuralNetClassifier:
+    net = NeuralNetClassifier(
+        SktorchNN(input_dim=input_dim, output_dim=output_dim, n_layers=n_layers, hidden_layers=hidden_layers),
+        max_epochs=max_epochs,
+        lr=lr,
+        batch_size=batch_size,
+        optimizer=optimizer,
+        criterion=criterion,
+        verbose=1,
+        device='cuda' if torch.cuda.is_available() else 'cpu',
+    )
+    
+    return net
+    
 def run_multiclass_classification(
         df: pd.DataFrame,
         model: BaseEstimator = None, 
@@ -36,6 +78,7 @@ def run_multiclass_classification(
         plot=True, 
         savename=None,
         verbose=True,
+        y_translation=None,
         plot_title="Multiclass Classification",
         ) -> tuple:
     """
@@ -105,16 +148,22 @@ def run_multiclass_classification(
         categorical_cols=categorical_features,
         test_size=test_size,
         group_col=id_col,
+        y_translation=y_translation,
     )
     
     
     scaler = MinMaxScaler()
     model = RandomForestClassifier(random_state=42, n_jobs=-1, max_depth=10, n_estimators=100, class_weight="balanced", verbose=verbose) if model is None else model
-    pipeline = make_pipeline(scaler, model)
+    pipeline = Pipeline([
+        ('scaler', scaler),
+        # ('tofloat32', ToFloat32()),
+        ('model', model),
+    ])
     pipeline.fit(X_train, y_train)
     y_pred = pipeline.predict(X_test)
 
-    transport_modes_plot = {k: v for k, v in transport_modes.items() if k in y_test.unique()}
+    transport_modes_plot = {(y_translation[k] if y_translation is not None else k): v
+                             for k, v in transport_modes.items() if k in y_test.unique()}
     classification_report_ = classification_report(y_test, y_pred, target_names=transport_modes_plot.values())
     print(classification_report_)
     accuracy = np.mean(y_pred == y_test)

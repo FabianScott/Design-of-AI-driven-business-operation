@@ -4,7 +4,6 @@ numerical_cols = [
     # Ignore nothing
     "ActDuur",        # V – Activity duration at destination (min) (0-9999, <missing> missing if not a displacement)
     "Leeftijd",       # P – Age of respondent (6‥98, 99 = 99 yrs or older)
-    "AfstS",          # V – Serie displacement distance NL (hectometres) (1-9999, <missing> missing if not a displacement or if a serial displacement)
     "AantVpl",        # P – Regular trips in NL (0 None, 1–25)
     "AantOVVpl",      # P – Regular public-transport trips (0 None, 1–25)
     "AantSVpl",       # P – Series trips (0 None, 1–25)
@@ -65,7 +64,6 @@ binary_cols = [
     "HHEFiets",         # P – E-bike present in household (0 = No, 1 = Yes, 2 = Unknown)
     "Kind6",            # V – Child(ren) under 6 travelling along (0 = No, 1 = Yes, 2 = Unknown, <missing> missing if not a displacement or if serial displacement)
     "CorrVerpl",        # V – Trip split into rides by editor (0 = No, 1 = Yes)
-    "SDezPlts",         # V – All series addresses in same place (0 = No, 1 = Yes)
     "VergVast", "VergKm", "VergBrSt", "VergOV",                             # P – Type of reimbursement: flat amount / per-km / fuel / public transport (0 No, 1 Yes, 2 N/A)
     "VergAans", "VergVoer", "VergBudg", "VergPark", "VergStal", "VergAnd",  # P – Reimbursement for purchase vehicle / lease vehicle / mobility budget / parking / bicycle storage / other (0 No, 1 Yes, 2 N/A)
     #### -----> Floris: end of what should be 0 or 1
@@ -122,9 +120,6 @@ ordinal_cols = [
     "BerStat", # P – Railway station: how often reachable? (1 Always, 2 Often, 3 Sometimes, 4 Seldom, 5 Never, 6 Unknown, 7 N/A (no need), 8 N/A < 15 y)
     #### ----> Floris: end of ignoring >=6
 
-    #### ----> Floris: ignore 7
-    "SAantAdr",     # V – Addresses visited in series (1 = 3, 2 = 4, 3 = 5, 4 = 6–10, 5 = 11–20, 6 = ≥21, 7 = Unknown)
-    #### ----> Floris: end of ignoring 7
 
     #### ----> Floris: ignore 9
     "HHLaagInk",    # P - Deviation from minimal-income lower bound (1 = Income until 80% of minimal income, 2 = Income from 80-85% of minimal income, ... 7 = Income of 105-110% of minimal income, 8 = Income of 110% or higher of minimal income, 9 = Income unknown)
@@ -171,6 +166,13 @@ categorical_cols = [
 "Hvm" # Is target variable, so we ignore it
 # Dropped cols (24)
 drop_cols = [
+ 
+    #### ----> Floris: ignore 7
+    "SAantAdr",     # V – Addresses visited in series (1 = 3, 2 = 4, 3 = 5, 4 = 6–10, 5 = 11–20, 6 = ≥21, 7 = Unknown)
+    #### ----> Floris: end of ignoring 7
+    "SDezPlts",         # V – All series addresses in same place (0 = No, 1 = Yes)
+    "AfstS",          # V – Serie displacement distance NL (hectometres) (1-9999, <missing> missing if not a displacement or if a serial displacement)
+
     # ── Trip characteristics ────────────────────────────────────────────────
     "AfstR",          # R – Trip distance NL (hectometres)  (0 = not a trip in NL, 1-999979 = distance in hectometers, <missing> missing if not a displacement)
     "AfstRBL",        # R – Trip distance abroad (hectometres) (0 = not a trip abroad, 1-999979 = distance in hectometers, <missing> missing if not a displacement)
