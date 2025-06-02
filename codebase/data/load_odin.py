@@ -7,6 +7,206 @@ import sys
 
 from codebase.data.load_demographics import load_excel
 
+def load_odin(years=None):
+    """
+    Reads and concatenates ODiN data for the specified years via load_excel().
+    Defaults to [2019, 2020, 2021, 2022, 2023] if no `years` provided.
+    Returns:
+        odin_df (DataFrame): concatenated ODiN data.
+    """
+    if years is None:
+        years = [2019, 2020, 2021, 2022, 2023]
+
+    odin_dfs = []
+    for year in years:
+        base_folder = os.path.join("data", "OdiN 2019-2023", f"OdiN {year}")
+        filename = f"ODiN{year}_Databestand.csv"
+        if year in [2019, 2020]:
+            filename = filename.replace("Databestand", "Databestand_v2.0")
+        odin_path = os.path.join(base_folder, filename)
+        df_year = load_excel(odin_path)
+        odin_dfs.append(df_year)
+
+    return pd.concat(odin_dfs, ignore_index=True)
+
+def odin_add_buurtcode(odin_df, mapping_path="data/buurt_to_PC_mapping.csv"):
+    """
+    Adds a 'BuurtCode' column to odin_df by matching the first 4 digits of 'WoPC'
+    to the first 4 digits of 'PC6' in the mapping CSV.
+    """
+    mapping_df = pd.read_csv(mapping_path, dtype={"PC6": str}, low_memory=False)
+    mapping_df["PC4"] = mapping_df["PC6"].str[:4]
+
+    result_df = (
+        mapping_df[["Buurt2024", "PC4"]]
+        .drop_duplicates()
+        .rename(columns={"PC4": "PC6"})
+        .drop_duplicates(subset=["PC6"], keep="first")
+        .reset_index(drop=True)
+    )
+
+    odin_df = odin_df.copy()
+    odin_df["WoPC"] = odin_df["WoPC"].astype(str)
+    odin_df["WoPC4"] = odin_df["WoPC"].str[:4]
+
+    mapping_dict = result_df.set_index("PC6")["Buurt2024"].to_dict()
+    odin_df["BuurtCode"] = odin_df["WoPC4"].map(mapping_dict)
+    odin_df.drop(columns=["WoPC4"], inplace=True)
+
+    return odin_df
+
+def clean_aggregate_numord(odin_df, numerical_cols, ordinal_cols):
+    """
+    Cleans & aggregates numerical + ordinal columns by BuurtCode.
+    Returns a DataFrame of mean values per BuurtCode.
+    """
+    exact_ignore_map = {
+        **{col: [11] for col in ["HHPers", "HHLft1", "HHLft2", "HHLft3", "HHLft4"]},
+        **{col: [9994, 9995] for col in ["BouwjaarPa1", "BouwjaarPa2", "BouwjaarPaL"]},
+        "BetWerk": [4, 5],
+        **{col: [8, 9] for col in ["KBouwjaarPa1", "KBouwjaarPa2", "KBouwjaarPaL"]},
+        "SAntAdr": [7],
+        "HHLaagInk": [9],
+        "HHSocInk": [10],
+        **{col: [11] for col in ["HHBestInkG", "HHGestInkG", "HHWelvG"]}
+    }
+    range_threshold_map = {
+        **{col: 10 for col in [
+            "HHRijbewijsAu", "HHRijbewijsMo", "HHRijbewijsBr",
+            "HHAuto", "HHAutoL", "OPAuto", "HHMotor", "OPMotor",
+            "HHBrom", "OPBrom", "HHSnor", "OPSnor"
+        ]},
+        **{col: 1 for col in ["AfstandOP", "AfstandSOP", "AfstV", "AfstR", "AfstRBL"]},
+        "KAfstV": 1, "KAfstR": 1,
+        **{col: 6 for col in [
+            "KGewichtPa1", "KGewichtPa2", "KGewichtPaL",
+            "BerHalte", "BerFam", "BerSport", "BerWrk", "BerOnd",
+            "BerSup", "BerZiek", "BerArts", "BerStat"
+        ]}
+    }
+
+    cols = [c for c in (numerical_cols + ordinal_cols) if c in odin_df.columns] + ["BuurtCode"]
+    df = odin_df[cols].copy()
+    df["BuurtCode"] = df["BuurtCode"].astype(str)
+
+    # Exact→NaN
+    replace_dict = {
+        col: {val: pd.NA for val in vals}
+        for col, vals in exact_ignore_map.items() if col in df.columns
+    }
+    if replace_dict:
+        df.replace(replace_dict, inplace=True)
+
+    # Range masks
+    for col, thresh in range_threshold_map.items():
+        if col not in df.columns:
+            continue
+        if thresh == 1:
+            df.loc[df[col] < 1, col] = pd.NA
+        else:
+            df.loc[df[col] >= thresh, col] = pd.NA
+
+    # Coerce to numeric
+    for col in (numerical_cols + ordinal_cols):
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    df = df[df["BuurtCode"].notna()]
+    valid_cols = [c for c in (numerical_cols + ordinal_cols) if c in df.columns]
+    return df.groupby("BuurtCode", observed=True)[valid_cols].mean().reset_index()
+
+
+def clean_aggregate_categorical(odin_df, categorical_cols):
+    """
+    Cleans & aggregates categorical columns by BuurtCode (mode).
+    Returns a DataFrame of mode values per BuurtCode.
+    """
+    cols = [c for c in categorical_cols if c in odin_df.columns] + ["BuurtCode"]
+    df = odin_df[cols].copy()
+    df["BuurtCode"] = df["BuurtCode"].astype(str)
+    df = df[df["BuurtCode"].notna()]
+
+    for col in categorical_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    valid_cols = [c for c in categorical_cols if c in df.columns]
+    return (
+        df.groupby("BuurtCode", observed=True)[valid_cols]
+          .agg(lambda x: x.mode().iloc[0] if not x.mode().empty else pd.NA)
+          .reset_index()
+    )
+
+
+def clean_aggregate_binary(odin_df, binary_cols):
+    """
+    Cleans & aggregates binary columns by BuurtCode (probability of 1).
+    Returns a DataFrame of mean values per BuurtCode.
+    """
+    cols = [c for c in binary_cols if c in odin_df.columns] + ["BuurtCode"]
+    df = odin_df[cols].copy()
+    df["BuurtCode"] = df["BuurtCode"].astype(str)
+    df = df[df["BuurtCode"].notna()]
+
+    groupA = [
+        "WrkVerg", "MeerWink", "OPRijbewijsAu", "OPRijbewijsMo", "OPRijbewijsBr",
+        "HHEFiets", "Kind6", "CorrVerpl", "SDezPlts", "Toer",
+        "VergVast", "VergKm", "VergBrSt", "VergOV",
+        "VergAans", "VergVoer", "VergBudg", "VergPark", "VergStal", "VergAnd"
+    ]
+    groupB = ["ByzAdr", "ByzVvm", "ByzTyd", "ByzDuur", "ByzRoute"]
+
+    for col in groupA:
+        if col in df.columns:
+            df.loc[~df[col].isin([0, 1]), col] = pd.NA
+
+    for col in groupB:
+        if col in df.columns:
+            df[col] = df[col].map({1: 1, 2: 0})
+
+    for col in binary_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    valid_cols = [c for c in binary_cols if c in df.columns]
+    return df.groupby("BuurtCode", observed=True)[valid_cols].mean().reset_index()
+
+
+def merge_odin_stats(demographics, odin_stats, key_demog="gwb_code_8", key_odin="BuurtCode"):
+    """
+    Merges odin_stats into demographics on demographics[key_demog] ↔ odin_stats[key_odin].
+    Returns merged DataFrame.
+    """
+    odin_stats[key_odin] = odin_stats[key_odin].astype(str)
+    demographics[key_demog] = demographics[key_demog].astype(str)
+
+    merged = pd.merge(
+        demographics,
+        odin_stats,
+        left_on=key_demog,
+        right_on=key_odin,
+        how="left",
+        validate="one_to_one"
+    )
+    merged.drop(columns=[key_odin], inplace=True)
+    return merged
+
+
+def prepare_odin_stats(odin_df):
+    """
+    Orchestrates cleaning & aggregation across all variable types.
+    Returns a single odin_stats DataFrame indexed by BuurtCode.
+    """
+    means = clean_aggregate_numord(odin_df, numerical_cols, ordinal_cols)
+    modes = clean_aggregate_categorical(odin_df, categorical_cols)
+    probs = clean_aggregate_binary(odin_df, binary_cols)
+
+    temp = pd.merge(means, modes, on="BuurtCode", how="outer", validate="one_to_one")
+    odin_stats = pd.merge(temp, probs, on="BuurtCode", how="outer", validate="one_to_one")
+    return odin_stats
+
+
+
 
 def make_ml_dataset(df: pd.DataFrame, target_col, drop_cols, categorical_cols=None, target_vals=None, test_size=0.2, random_state=42, stratification_col=None, group_col=None, y_translation: dict=None) -> tuple:
     """
