@@ -24,7 +24,6 @@ numerical_cols = [
     "HHRijbewijsAu",  # P – Car licences in household (0‥8, 9 = ≥9, 10 = Unknown)
     "HHRijbewijsMo",  # P – Motorcycle licences in household (0‥8, 9 = ≥9, 10 = Unknown)
     "HHRijbewijsBr",  # P – Moped licences in household (0‥8, 9 = ≥9, 10 = Unknown)
-    "HHFiets",        # P – Bicycles in household (0‥8, 9 = ≥9, 10 = Unknown)
     "HHAuto",         # P – Passenger cars in household (0‥8, 9 = ≥9, 10 = Unknown)
     "HHAutoL",        # P – Lease / company cars in household (0‥8, 9 = ≥9, 10 = Unknown)
     "OPAuto",         # P – Cars on respondent’s name (0‥8, 9 = ≥9, 10 = Unknown)
@@ -55,7 +54,7 @@ numerical_cols = [
 
 # ── BINARY (36) ────────────────────────────────────────────────────────────────
 binary_cols = [
-    ####-----> Floris: These should only include 0 or 1. 
+    ####-----> Floris: These should only include 0 or 1. (Ignore everything else)
     "WrkVerg",          # P – Any travel cost reimbursement (0 No, 1 Yes, 2 Unknown, 3 N/A)
     "MeerWink",         # V – Multiple shops visited (0 No, 1 Yes, 2 Unknown, 3 N/A – no shopping, <missing> missing if not a displacement)
     "OPRijbewijsAu",    # P – Respondent holds car licence (0 = No, 1 = Yes, 2 = Unknown)
@@ -69,7 +68,7 @@ binary_cols = [
     #### -----> Floris: end of what should be 0 or 1
 
 
-    #### -----> Floris: these should be 1 or 2
+    #### -----> Floris: these should be 1 or 2 (ignore 3)
     # ── Car-usage source flags ──
     "ByzAdr",    # P – Special: other addresses visited? (0 N/A (no displacements), 1 Yes, 2 No, 3 Not asked)
     "ByzVvm",    # P – Special: other modes used? (0 N/A (no displacements), 1 Yes, 2 No, 3 Not asked)
@@ -159,7 +158,7 @@ categorical_cols = [
     "AardWerk",             # V – Nature of work (1 Construction, 2 Service, 3 Delivery, 4 Goods-transport, 5 Passenger-transport, 6 Care, 7 Emergency, 8 Business, 9 Collection, 10 Other, 11 Unknown, 12 N/A, <missing> missing if not a displacement)
     "Weggeweest",           # P – Was away yesterday? (0 No, 1 Yes, 6 Series trip, 7 Work truck trip, 8 Work-truck series)
     "VolgWerk",             # V – Sequence of work trips (1 Stand-alone work trip, 2 1st of 2, 3 2nd of 2, 4 1st of 3, 5 2nd of 3, 6 3rd of 3, 7 1st of series-followed trips, 8 Series work trip, 9 N/A – not work)
-    "KVertTijd",      # V – Departure-time class (1 00:00-04:00, 2 04:00-07:00, 3 07:00-08:00, 4 08:00-09:00, 5 09:00-12:00, 6 12:00-13:00, 7 13:00-14:00, 8 14:00-16:00, 9 16:00-17:00, 10 17:00-18:00, 11 18:00-19:00, 12 19:00-20:00, 13 20:00-24:00)
+    "KVertTijd",            # V – Departure-time class (1 00:00-04:00, 2 04:00-07:00, 3 07:00-08:00, 4 08:00-09:00, 5 09:00-12:00, 6 12:00-13:00, 7 13:00-14:00, 8 14:00-16:00, 9 16:00-17:00, 10 17:00-18:00, 11 18:00-19:00, 12 19:00-20:00, 13 20:00-24:00)
     "Prov",                 # P – Province of residence (1 Groningen … 12 Limburg)
 ]
 
