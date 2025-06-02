@@ -161,9 +161,14 @@ def run_multiclass_classification(
     ])
     pipeline.fit(X_train, y_train)
     y_pred = pipeline.predict(X_test)
-
-    transport_modes_plot = {(y_translation[k] if y_translation is not None else k): v
-                             for k, v in transport_modes.items() if k in y_test.unique()}
+    
+    # If y_translation is provided, reverse the mapping for y_test and y_pred
+    if y_translation is not None:
+        y_translation_reverse = {v: k for k, v in y_translation.items()}
+        y_test = y_test.map(y_translation_reverse).values
+        y_pred = pd.Series(y_pred, ).map(y_translation_reverse).values
+    
+    transport_modes_plot = {k: v for k, v in transport_modes.items() if k in np.unique(y_test)}
     classification_report_ = classification_report(y_test, y_pred, target_names=transport_modes_plot.values())
     print(classification_report_)
     accuracy = np.mean(y_pred == y_test)
