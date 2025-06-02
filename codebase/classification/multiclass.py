@@ -163,7 +163,8 @@ def run_multiclass_classification(
     y_pred = pipeline.predict(X_test)
 
     transport_modes_plot = {(y_translation[k] if y_translation is not None else k): v
-                             for k, v in transport_modes.items() if k in y_test.unique()}
+                             for k, v in transport_modes.items() if 
+                             (y_translation[k] if y_translation is not None else k) in y_test.unique()}
     classification_report_ = classification_report(y_test, y_pred, target_names=transport_modes_plot.values())
     print(classification_report_)
     accuracy = np.mean(y_pred == y_test)
