@@ -76,17 +76,6 @@ binary_cols = [
 
     #### -----> Floris: these should be 1 or 2
     # ── Car-usage source flags ──
-    "AutoEig",          # P – Used own car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoHhl",          # P – Used household member’s car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoLWg",          # P – Used employer lease-car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoLPl",          # P – Used private-lease car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoBed",          # P – Used company-registered car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoDOrg",         # P – Used organisation car-share (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoDPart",        # P – Used peer-to-peer (online) shared car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoDBek",         # P - Used share car with friends (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoLeen",         # P - Used a borrowed car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoHuur",         # P - Used a rental car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoAnd",          # P - Used a different kind of car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
     "ByzAdr",    # P – Special: other addresses visited? (0 N/A (no displacements), 1 Yes, 2 No, 3 Not asked)
     "ByzVvm",    # P – Special: other modes used? (0 N/A (no displacements), 1 Yes, 2 No, 3 Not asked)
     "ByzTyd",    # P – Special: other times travelled? (0 N/A (no displacements), 1 Yes, 2 No, 3 Not asked)
@@ -199,6 +188,18 @@ drop_cols = [
     "RTSamen",      # R – Train party size (1‥8, 9 = 9-12, 10 = 12-20, 11 = ≥20, 12 = Unknown, 13 = N/A)
     #### ----> Floris: end of ignoring 12 and 13
     "RAantIn",        # R – Occupants in car (1‥8, 9 = ≥9, 10 Unknown, 11 N/A)  
+    # ── Car-usage source flags ─────────────────────────────────────────────
+    "AutoEig",          # P – Used own car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoHhL",          # P – Used household member’s car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoLWg",          # P – Used employer lease-car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoLPl",          # P – Used private-lease car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoBed",          # P – Used company-registered car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoDOrg",         # P – Used organisation car-share (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoDPart",        # P – Used peer-to-peer (online) shared car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoDBek",         # P - Used share car with friends (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoLeen",         # P - Used a borrowed car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoHuur",         # P - Used a rental car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoAnd",          # P - Used a different kind of car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
     # 
     #     # Removed as they cannot be generalised:
     "RdHalteA",             # P – Reason A stop not always reachable (1 No own transport, 2 Cannot/will-not cycle, 3 Cannot/will-not use Public Transport, 4 Cannot/will-not use taxi, 5 Cannot travel alone, 6 Health, 7 Journey too long, 8 Too expensive, 9 Traffic too busy, 10 Feels unsafe, 11 Other, 12 Unknown, 13 N/A (always reachable), 14 N/A (other reason))
