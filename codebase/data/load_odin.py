@@ -6,6 +6,9 @@ import sys
 
 
 from codebase.data.load_demographics import load_excel
+from codebase.data.column_lists import (
+    numerical_cols, ordinal_cols, categorical_cols, binary_cols
+)
 
 def load_odin(years=None):
     """
@@ -197,18 +200,35 @@ def prepare_odin_stats(odin_df):
     Orchestrates cleaning & aggregation across all variable types.
     Returns a single odin_stats DataFrame indexed by BuurtCode.
     """
+
     means = clean_aggregate_numord(odin_df, numerical_cols, ordinal_cols)
     modes = clean_aggregate_categorical(odin_df, categorical_cols)
     probs = clean_aggregate_binary(odin_df, binary_cols)
 
     temp = pd.merge(means, modes, on="BuurtCode", how="outer", validate="one_to_one")
     odin_stats = pd.merge(temp, probs, on="BuurtCode", how="outer", validate="one_to_one")
+
+    counts = odin_df['BuurtCode'].value_counts().rename_axis('BuurtCode').reset_index(name='Count')
+    odin_stats = pd.merge(odin_stats, counts, on="BuurtCode", how="left", validate="one_to_one")
+
     return odin_stats
 
 
 
 
-def make_ml_dataset(df: pd.DataFrame, target_col, drop_cols, categorical_cols=None, target_vals=None, test_size=0.2, random_state=42, stratification_col=None, group_col=None, y_translation: dict=None) -> tuple:
+def make_ml_dataset(
+        df: pd.DataFrame, 
+        target_col, 
+        drop_cols, 
+        categorical_cols=None, 
+        target_vals=None, 
+        test_size=0.2, 
+        random_state=42, 
+        stratification_col=None, 
+        group_col=None, 
+        y_translation: dict=None,
+        ensure_common_labels: bool = True
+        ) -> tuple:
     """
     Splits the dataset into training and testing sets.
     """
@@ -227,6 +247,8 @@ def make_ml_dataset(df: pd.DataFrame, target_col, drop_cols, categorical_cols=No
     X = df_.drop(columns=[target_col])
     categorical_cols_to_use = [col for col in categorical_cols if col in X.columns] if categorical_cols else []
     X = pd.get_dummies(X, columns=categorical_cols_to_use, drop_first=True, dtype=np.int64)
+    # Cast all non categorical columns to float
+    X = X.astype({col: float for col in X.columns if col.split("_")[0] not in categorical_cols_to_use})
     y: pd.DataFrame = df_[target_col].isin(target_vals) if target_vals is not None else df_[target_col]
     y = y.astype(np.int64)
     if y_translation:
@@ -243,20 +265,21 @@ def make_ml_dataset(df: pd.DataFrame, target_col, drop_cols, categorical_cols=No
     else:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=stratification)
 
-    # 1. Find the set of labels that occur in both y_train and y_test
-    common_labels = np.intersect1d(np.unique(y_train), np.unique(y_test))
+    if ensure_common_labels:
+        # 1. Find the set of labels that occur in both y_train and y_test
+        common_labels = np.intersect1d(np.unique(y_train), np.unique(y_test))
 
-    print(f"Common labels: {common_labels}")
+        print(f"Common labels: {common_labels}")
 
-    # 2. Create boolean masks
-    train_mask = y_train.isin(common_labels)
-    test_mask = y_test.isin(common_labels)
+        # 2. Create boolean masks
+        train_mask = y_train.isin(common_labels)
+        test_mask = y_test.isin(common_labels)
 
-    # 3. Filter both sets
-    X_train = X_train[train_mask]
-    y_train = y_train[train_mask]
-    X_test = X_test[test_mask]
-    y_test = y_test[test_mask]
+        # 3. Filter both sets
+        X_train = X_train[train_mask]
+        y_train = y_train[train_mask]
+        X_test = X_test[test_mask]
+        y_test = y_test[test_mask]
 
     return X_train, X_test, y_train, y_test
 
