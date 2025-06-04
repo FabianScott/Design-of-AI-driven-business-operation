@@ -282,3 +282,27 @@ def run_transferable_classification(
                 show=plot
             )
     return demographics_with_predictions
+
+def get_feature_importances(feature_importances, column_names, top_n_for_plot=100, savename=None):
+    """
+    Feature importances for multiclass classification.
+    """
+    importances = pd.Series(feature_importances, index=column_names)
+    
+    # Group by base feature name (e.g., col_1 from col_1.0, col_1.1)
+    grouped = importances.groupby(lambda x: x.split('_')[0]).sum()
+    top_features = grouped.sort_values(ascending=False)[:top_n_for_plot]
+    num_features = len(grouped)
+    num_plotted_features = min(num_features, top_n_for_plot)
+
+    top_features.plot(kind="bar", figsize=(14, 6))
+    plt.title(f"Top {num_plotted_features}/{num_features} Feature Importances for Multiclass Classification")
+    plt.xlabel("Feature")
+    plt.ylabel("Importance")
+    plt.tight_layout()
+    plt.xticks(rotation=65)
+    if savename:
+        plt.savefig(savename)
+    plt.show()
+    
+    return grouped
