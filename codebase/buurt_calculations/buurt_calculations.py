@@ -188,10 +188,10 @@ def calculate_added_willingness(
     # Calculate the proportion of the difference relative to the original willingness to cycle
     df_filtered["willingness_diff_proportion"] = (df_filtered["willingness_diff"] / df_filtered[willingness_to_cycle_column])
     
-    improvement_mask = df_filtered["willingness_diff_proportion"] > 0
+    improvement_mask = df_filtered["willingness_diff"] > 0
     df_filtered[improvement_column] = 0
     demo_col_to_use = demographics_population_column if age_group_column is None else age_group_column
-    n_improvement = df_location[demo_col_to_use][improvement_mask].values * df_filtered["willingness_diff_proportion"][improvement_mask].values
+    n_improvement = df_location[demo_col_to_use][improvement_mask].values * df_filtered["willingness_diff"][improvement_mask].values
     df_filtered.loc[improvement_mask, improvement_column] = np.round(n_improvement)
     
     if plot:

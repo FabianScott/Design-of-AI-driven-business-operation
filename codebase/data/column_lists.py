@@ -4,7 +4,6 @@ numerical_cols = [
     # Ignore nothing
     "ActDuur",        # V – Activity duration at destination (min) (0-9999, <missing> missing if not a displacement)
     "Leeftijd",       # P – Age of respondent (6‥98, 99 = 99 yrs or older)
-    "AfstS",          # V – Serie displacement distance NL (hectometres) (1-9999, <missing> missing if not a displacement or if a serial displacement)
     "AantVpl",        # P – Regular trips in NL (0 None, 1–25)
     "AantOVVpl",      # P – Regular public-transport trips (0 None, 1–25)
     "AantSVpl",       # P – Series trips (0 None, 1–25)
@@ -25,7 +24,6 @@ numerical_cols = [
     "HHRijbewijsAu",  # P – Car licences in household (0‥8, 9 = ≥9, 10 = Unknown)
     "HHRijbewijsMo",  # P – Motorcycle licences in household (0‥8, 9 = ≥9, 10 = Unknown)
     "HHRijbewijsBr",  # P – Moped licences in household (0‥8, 9 = ≥9, 10 = Unknown)
-    "HHFiets",        # P – Bicycles in household (0‥8, 9 = ≥9, 10 = Unknown)
     "HHAuto",         # P – Passenger cars in household (0‥8, 9 = ≥9, 10 = Unknown)
     "HHAutoL",        # P – Lease / company cars in household (0‥8, 9 = ≥9, 10 = Unknown)
     "OPAuto",         # P – Cars on respondent’s name (0‥8, 9 = ≥9, 10 = Unknown)
@@ -50,15 +48,13 @@ numerical_cols = [
     "AfstandOP",      # P – Total distance regular displacements (hectometres) (0 = no displacements, 1-999999)
     "AfstandSOP",     # P – Total distance series displacements (hectometres) (0 = no displacements, 1-999999)
     "AfstV",          # V – Displacement distance NL (hectometres) (0 No regular displacements in NL, 1..99999, <missing> missing if not a displacement or if a serial displacement)
-    "AfstR",          # R – Trip distance NL (hectometres)  (0 = not a trip in NL, 1-999979 = distance in hectometers, <missing> missing if not a displacement)
-    "AfstRBL",        # R – Trip distance abroad (hectometres) (0 = not a trip abroad, 1-999979 = distance in hectometers, <missing> missing if not a displacement)
     #### ----> Floris: end of ignoring 0
 ]
 
 
 # ── BINARY (36) ────────────────────────────────────────────────────────────────
 binary_cols = [
-    ####-----> Floris: These should only include 0 or 1. 
+    ####-----> Floris: These should only include 0 or 1. (Ignore everything else)
     "WrkVerg",          # P – Any travel cost reimbursement (0 No, 1 Yes, 2 Unknown, 3 N/A)
     "MeerWink",         # V – Multiple shops visited (0 No, 1 Yes, 2 Unknown, 3 N/A – no shopping, <missing> missing if not a displacement)
     "OPRijbewijsAu",    # P – Respondent holds car licence (0 = No, 1 = Yes, 2 = Unknown)
@@ -67,26 +63,13 @@ binary_cols = [
     "HHEFiets",         # P – E-bike present in household (0 = No, 1 = Yes, 2 = Unknown)
     "Kind6",            # V – Child(ren) under 6 travelling along (0 = No, 1 = Yes, 2 = Unknown, <missing> missing if not a displacement or if serial displacement)
     "CorrVerpl",        # V – Trip split into rides by editor (0 = No, 1 = Yes)
-    "SDezPlts",         # V – All series addresses in same place (0 = No, 1 = Yes)
-    "Toer",             # V – Departure point is arrival point? (0 = No, 1 = Yes, <missing> if not a displacement or if a serial displacement)
     "VergVast", "VergKm", "VergBrSt", "VergOV",                             # P – Type of reimbursement: flat amount / per-km / fuel / public transport (0 No, 1 Yes, 2 N/A)
     "VergAans", "VergVoer", "VergBudg", "VergPark", "VergStal", "VergAnd",  # P – Reimbursement for purchase vehicle / lease vehicle / mobility budget / parking / bicycle storage / other (0 No, 1 Yes, 2 N/A)
     #### -----> Floris: end of what should be 0 or 1
 
 
-    #### -----> Floris: these should be 1 or 2
+    #### -----> Floris: these should be 1 or 2 (ignore 3)
     # ── Car-usage source flags ──
-    "AutoEig",          # P – Used own car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoHhl",          # P – Used household member’s car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoLWg",          # P – Used employer lease-car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoLPl",          # P – Used private-lease car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoBed",          # P – Used company-registered car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoDOrg",         # P – Used organisation car-share (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoDPart",        # P – Used peer-to-peer (online) shared car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoDBek",         # P - Used share car with friends (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoLeen",         # P - Used a borrowed car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoHuur",         # P - Used a rental car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
-    "AutoAnd",          # P - Used a different kind of car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
     "ByzAdr",    # P – Special: other addresses visited? (0 N/A (no displacements), 1 Yes, 2 No, 3 Not asked)
     "ByzVvm",    # P – Special: other modes used? (0 N/A (no displacements), 1 Yes, 2 No, 3 Not asked)
     "ByzTyd",    # P – Special: other times travelled? (0 N/A (no displacements), 1 Yes, 2 No, 3 Not asked)
@@ -113,7 +96,6 @@ ordinal_cols = [
 
     #### ----> Floris: ignore 0 
     "KAfstV",   # V – Trip distance class NL (0 None (Not NL), 1 0.1-0.5 km, 2 0.5-1 km, 3 1-2.5 km, 4 2.5-3.7 km, 5 3.7-5 km, 6 5-7.5 km, 7 7.5-10 km, 8 10-15 km, 9 15-20 km, 10 20-30 km, 11 30-40 km, 12 40-50 km, 13 50-75 km, 14 75-100 km, 15 ≥ 100 km, <missing> if not a displacement or if a serial displacement)
-    "KAfstR",   # R – Ride distance class NL (0 None, 1 0.1-0.5 km … 15 ≥ 100 km)
     #### ----> Floris: end of ignoring 0
 
     #### ----> Floris: ignore 4 and 5 
@@ -137,9 +119,6 @@ ordinal_cols = [
     "BerStat", # P – Railway station: how often reachable? (1 Always, 2 Often, 3 Sometimes, 4 Seldom, 5 Never, 6 Unknown, 7 N/A (no need), 8 N/A < 15 y)
     #### ----> Floris: end of ignoring >=6
 
-    #### ----> Floris: ignore 7
-    "SAantAdr",     # V – Addresses visited in series (1 = 3, 2 = 4, 3 = 5, 4 = 6–10, 5 = 11–20, 6 = ≥21, 7 = Unknown)
-    #### ----> Floris: end of ignoring 7
 
     #### ----> Floris: ignore 9
     "HHLaagInk",    # P - Deviation from minimal-income lower bound (1 = Income until 80% of minimal income, 2 = Income from 80-85% of minimal income, ... 7 = Income of 105-110% of minimal income, 8 = Income of 110% or higher of minimal income, 9 = Income unknown)
@@ -179,16 +158,29 @@ categorical_cols = [
     "AardWerk",             # V – Nature of work (1 Construction, 2 Service, 3 Delivery, 4 Goods-transport, 5 Passenger-transport, 6 Care, 7 Emergency, 8 Business, 9 Collection, 10 Other, 11 Unknown, 12 N/A, <missing> missing if not a displacement)
     "Weggeweest",           # P – Was away yesterday? (0 No, 1 Yes, 6 Series trip, 7 Work truck trip, 8 Work-truck series)
     "VolgWerk",             # V – Sequence of work trips (1 Stand-alone work trip, 2 1st of 2, 3 2nd of 2, 4 1st of 3, 5 2nd of 3, 6 3rd of 3, 7 1st of series-followed trips, 8 Series work trip, 9 N/A – not work)
-    "KVertTijd",      # V – Departure-time class (1 00:00-04:00, 2 04:00-07:00, 3 07:00-08:00, 4 08:00-09:00, 5 09:00-12:00, 6 12:00-13:00, 7 13:00-14:00, 8 14:00-16:00, 9 16:00-17:00, 10 17:00-18:00, 11 18:00-19:00, 12 19:00-20:00, 13 20:00-24:00)
+    "KVertTijd",            # V – Departure-time class (1 00:00-04:00, 2 04:00-07:00, 3 07:00-08:00, 4 08:00-09:00, 5 09:00-12:00, 6 12:00-13:00, 7 13:00-14:00, 8 14:00-16:00, 9 16:00-17:00, 10 17:00-18:00, 11 18:00-19:00, 12 19:00-20:00, 13 20:00-24:00)
     "Prov",                 # P – Province of residence (1 Groningen … 12 Limburg)
 ]
 
-"Rvm" # Is target variable, so we ignore it
+"Hvm" # Is target variable, so we ignore it
 # Dropped cols (24)
 drop_cols = [
+ 
+    #### ----> Floris: ignore 7
+    "SAantAdr",     # V – Addresses visited in series (1 = 3, 2 = 4, 3 = 5, 4 = 6–10, 5 = 11–20, 6 = ≥21, 7 = Unknown)
+    #### ----> Floris: end of ignoring 7
+    "SDezPlts",         # V – All series addresses in same place (0 = No, 1 = Yes)
+    "AfstS",          # V – Serie displacement distance NL (hectometres) (1-9999, <missing> missing if not a displacement or if a serial displacement)
+
+    # ── Trip characteristics ────────────────────────────────────────────────
+    "AfstR",          # R – Trip distance NL (hectometres)  (0 = not a trip in NL, 1-999979 = distance in hectometers, <missing> missing if not a displacement)
+    "AfstRBL",        # R – Trip distance abroad (hectometres) (0 = not a trip abroad, 1-999979 = distance in hectometers, <missing> missing if not a displacement)
+    "KAfstR",   # R – Ride distance class NL (0 None, 1 0.1-0.5 km … 15 ≥ 100 km)
+    
+    "Toer",             # V – Departure point is arrival point? (0 = No, 1 = Yes, <missing> if not a displacement or if a serial displacement)
 
     # Confounds with target variable:
-    "Hvm",            # R/V – Detailed ride / main trip mode (1 Car, 2 Train, … 24 Other-no-motor)
+    "Rvm",            # R/V – Detailed ride / main trip mode (1 Car, 2 Train, … 24 Other-no-motor)
     "KHvm",                 # V – Trip mode class (1 Car-driver, 2 Car-passenger, 3 Train, 4 Bus/Tram/Metro, 5 Bicycle, 6 Walk, 7 Other, <missing> missing if not a displacement)
     "EFiets",               # P – Type of e-bike used (0 N/A, 1 E-bike, 2 Speed-pedelec, 3 Both, 4 Unknown, 5 Not asked/no e-bike)
     "WrkVervw",             # P – Transport mode to work with most km's (1 Walk, 2 Bicycle/e-bike, 3 Moped, 4 Car, 5 Van, 6 Motorcycle, 7 Train, 8 Bus/Tram/Metro, 9 Other, 10 Unknown, 11 N/A works from home, 12 N/A No paid work, 13 N/A < 15 y)
@@ -199,6 +191,18 @@ drop_cols = [
     "RTSamen",      # R – Train party size (1‥8, 9 = 9-12, 10 = 12-20, 11 = ≥20, 12 = Unknown, 13 = N/A)
     #### ----> Floris: end of ignoring 12 and 13
     "RAantIn",        # R – Occupants in car (1‥8, 9 = ≥9, 10 Unknown, 11 N/A)  
+    # ── Car-usage source flags ─────────────────────────────────────────────
+    "AutoEig",          # P – Used own car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoHhL",          # P – Used household member’s car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoLWg",          # P – Used employer lease-car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoLPl",          # P – Used private-lease car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoBed",          # P – Used company-registered car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoDOrg",         # P – Used organisation car-share (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoDPart",        # P – Used peer-to-peer (online) shared car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoDBek",         # P - Used share car with friends (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoLeen",         # P - Used a borrowed car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoHuur",         # P - Used a rental car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
+    "AutoAnd",          # P - Used a different kind of car (0 = N/A (person has no displacements), 1 = Yes, 2 = No, 3 = Unknown, 4 = Not asked)
     # 
     #     # Removed as they cannot be generalised:
     "RdHalteA",             # P – Reason A stop not always reachable (1 No own transport, 2 Cannot/will-not cycle, 3 Cannot/will-not use Public Transport, 4 Cannot/will-not use taxi, 5 Cannot travel alone, 6 Health, 7 Journey too long, 8 Too expensive, 9 Traffic too busy, 10 Feels unsafe, 11 Other, 12 Unknown, 13 N/A (always reachable), 14 N/A (other reason))

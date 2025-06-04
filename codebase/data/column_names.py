@@ -15,7 +15,7 @@ punt_distance_column = 'reisafstand_m'
 # Columns for ODIN
 distance_col = "AfstV"          # Distance column in the dataframe
 duration_col = "Reisduur"       # Duration column in the dataframe
-transport_mode_col = "Rvm"     # Transport mode column in the dataframe    Floris: I think this should be Rvm
+transport_mode_col = "Hvm"     # Transport mode column in the dataframe    Floris: I think this should be Rvm
 origin_col = "VertPC"           # Origin column in the dataframe   
 destination_col = "AankPC"      # Destination column in the dataframe
 motive_col = "KMotiefV"         # Categorical motive column in the dataframe
