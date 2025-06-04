@@ -74,10 +74,9 @@ def plot_value_by_buurt_heatmap(df_punt, col_name, show=True, savename=None, cma
     df_punt["buurtcode"] = df_punt[punt_buurt_code_column].astype(str)
     # Merge the two dataframes on the buurtcode, and fill the NaN values with 0
     gdf = gdf.merge(df_punt, on='buurtcode', how='left')
-    gdf = gdf.fillna(0)
 
     fig = plt.figure(figsize=(10, 10), frameon=False)
-    gdf.plot(column=col_name, cmap=cmap, markersize=5, legend=True)
+    gdf.plot(column=col_name, cmap=cmap, markersize=5, legend=True, missing_kwds={"color": "lightgrey", "label": "No data"})
 
     plt.title(f"Heatmap of {col_name} by Buurt")
     plt.axis("off")

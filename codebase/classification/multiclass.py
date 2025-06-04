@@ -9,17 +9,19 @@ from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import Pipeline
 
-from codebase.data.load_odin import make_ml_dataset
+from codebase.data.load_odin import make_ml_dataset, prepare_odin_stats, odin_add_buurtcode
 from codebase.data.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_destination, filter_by_motive, transport_modes
-from codebase.data.column_names import transport_mode_col, id_col
+from codebase.data.column_names import transport_mode_col, id_col, punt_buurt_code_column
 from codebase.plotting.plots import plot_confusion_matrix
+from codebase.plotting.plots import plot_value_by_buurt_heatmap
 from codebase.data.column_lists import (
     drop_cols, 
     numerical_cols,
     categorical_cols,
     ordinal_cols,
-    binary_cols
+    binary_cols,
 )
+
 
 import torch
 import torch.nn as nn
@@ -178,3 +180,85 @@ def run_multiclass_classification(
         plot_confusion_matrix(cm, labels=transport_modes_plot.values(), title=plot_title, savename=savename)
 
     return pipeline, (X_train, X_test, y_test, y_pred), accuracy 
+
+
+def run_transferable_classification(
+        odin_df: pd.DataFrame, 
+        pipeline_transferable,
+        cols_for_transferable, 
+        necessary_columns,
+        threshold_datapoints=100, 
+        unused_target="a_inw",
+        col_car_pred = "willingness_to_car_pred",
+        col_cycle_pred = "willingness_to_cycle_pred",
+        col_ebike_pred = "willingness_to_ebike_pred",
+        col_walk_pred = "willingness_to_walk_pred",
+        goal_value=7,
+        motive_value=6,
+        plot=True,
+    ):
+    
+    # Ensure the DataFrame has the necessary columns
+    odin_df["BuurtCode"] = odin_df["WoPC"].astype(str)  
+    odin_df[punt_buurt_code_column] = odin_df["BuurtCode"].astype(str)
+    # Ensure the 'WoPC' column is present and format the 'BuurtCode' column for plotting later
+    stats_df = prepare_odin_stats(odin_df, buurt_code_column="BuurtCode",)
+    stats_df["WoPC"] = stats_df["BuurtCode"]
+    stats_df = odin_add_buurtcode(stats_df, buurt_code_column="BuurtCode")
+    stats_df[punt_buurt_code_column] = stats_df["BuurtCode"].apply(lambda x: "BU" + str(x)).astype(str)
+    
+    # Filter the DataFrame based on the threshold for the number of trips per BuurtCode 
+    mask_count = stats_df["Count"] > threshold_datapoints
+    demographics = stats_df[mask_count]
+    # Set the goal and motive values
+    demographics.loc[:, "Doel"] = goal_value         # Education
+    demographics.loc[:, "KMotiefV"] = motive_value   # Education
+    print(f"Contains {len(demographics)} rows with more than {threshold_datapoints} trips per BuurtCode.")
+    demographics[unused_target] = 0
+    # Make the categorical columns and remove the unused columns
+    categorical_cols_for_transferable = [col for col in cols_for_transferable if col in categorical_cols]
+    cols_to_drop_transferable = [col for col in demographics.columns if col not in cols_for_transferable + [unused_target, id_col]]
+    # Turn the DataFrame into a machine learning dataset
+    demographics_ml_X, _, _, _ = make_ml_dataset(
+        demographics,
+        target_col=unused_target,
+        categorical_cols=categorical_cols_for_transferable,
+        group_col=None,
+        drop_cols=cols_to_drop_transferable,
+        test_size=0.0001,
+        ensure_common_labels=False
+    )
+    # Ensure the DataFrame has the necessary columns for the model
+    demographics_ml_X = demographics_ml_X.dropna()
+    missing_cols = set(necessary_columns) - set(demographics_ml_X.columns)
+    for col in missing_cols:
+        demographics_ml_X[col] = 0
+    demographics_ml_X = demographics_ml_X[necessary_columns]
+
+    # Predict the probabilities using the transferable model
+    predicted_probs = pipeline_transferable.predict_proba(demographics_ml_X)
+    # Create a DataFrame with the predictions
+    demographics_ml_with_predictions = demographics_ml_X.copy()
+    demographics_ml_with_predictions[transport_mode_col + "_pred"] = np.argmax(predicted_probs, axis=1)
+    demographics_ml_with_predictions[col_car_pred] = predicted_probs[:, 0]  # Assuming index 0 corresponds to car
+    demographics_ml_with_predictions[col_cycle_pred] = predicted_probs[:, 1]  # Assuming index 1 corresponds to cycling
+    demographics_ml_with_predictions[col_ebike_pred] = predicted_probs[:, 2]  # Assuming index 2 corresponds to e-biking
+    demographics_ml_with_predictions[col_walk_pred] = predicted_probs[:, 3]  # Assuming index 3 corresponds to walking
+
+    demographics_with_predictions = demographics.copy()
+    demographics_with_predictions = demographics_with_predictions.merge(
+        demographics_ml_with_predictions[[transport_mode_col + "_pred", col_car_pred, col_cycle_pred, col_ebike_pred, col_walk_pred]],
+        how="left",
+        left_index=True,
+        right_index=True
+    )
+
+    if plot:
+        for col in [col_cycle_pred, col_ebike_pred, col_walk_pred]:
+            plot_value_by_buurt_heatmap(
+                demographics_with_predictions,
+                col_name=col,
+                # title=f"Willingness to {col.replace('willingness_to_', '').capitalize()} by Buurt according to Transferable Model",
+                savename=f"graphics/classification_results/multiclass/transferable_{col}.png",
+                show=plot
+            )

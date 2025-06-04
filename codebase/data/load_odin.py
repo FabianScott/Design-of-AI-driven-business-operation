@@ -32,7 +32,7 @@ def load_odin(years=None):
 
     return pd.concat(odin_dfs, ignore_index=True)
 
-def odin_add_buurtcode(odin_df, mapping_path="data/buurt_to_PC_mapping.csv"):
+def odin_add_buurtcode(odin_df, mapping_path="data/buurt_to_PC_mapping.csv", buurt_code_column="BuurtCode"):
     """
     Adds a 'BuurtCode' column to odin_df by matching the first 4 digits of 'WoPC'
     to the first 4 digits of 'PC6' in the mapping CSV.
@@ -53,7 +53,7 @@ def odin_add_buurtcode(odin_df, mapping_path="data/buurt_to_PC_mapping.csv"):
     odin_df["WoPC4"] = odin_df["WoPC"].str[:4]
 
     mapping_dict = result_df.set_index("PC6")["Buurt2024"].to_dict()
-    odin_df["BuurtCode"] = odin_df["WoPC4"].map(mapping_dict)
+    odin_df[buurt_code_column] = odin_df["WoPC4"].map(mapping_dict)
     odin_df.drop(columns=["WoPC4"], inplace=True)
 
     return odin_df
@@ -195,7 +195,7 @@ def merge_odin_stats(demographics, odin_stats, key_demog="gwb_code_8", key_odin=
     return merged
 
 
-def prepare_odin_stats(odin_df):
+def prepare_odin_stats(odin_df, buurt_code_column="BuurtCode"):
     """
     Orchestrates cleaning & aggregation across all variable types.
     Returns a single odin_stats DataFrame indexed by BuurtCode.
@@ -205,11 +205,11 @@ def prepare_odin_stats(odin_df):
     modes = clean_aggregate_categorical(odin_df, categorical_cols)
     probs = clean_aggregate_binary(odin_df, binary_cols)
 
-    temp = pd.merge(means, modes, on="BuurtCode", how="outer", validate="one_to_one")
-    odin_stats = pd.merge(temp, probs, on="BuurtCode", how="outer", validate="one_to_one")
+    temp = pd.merge(means, modes, on=buurt_code_column, how="outer", validate="one_to_one")
+    odin_stats = pd.merge(temp, probs, on=buurt_code_column, how="outer", validate="one_to_one")
 
-    counts = odin_df['BuurtCode'].value_counts().rename_axis('BuurtCode').reset_index(name='Count')
-    odin_stats = pd.merge(odin_stats, counts, on="BuurtCode", how="left", validate="one_to_one")
+    counts = odin_df[buurt_code_column].value_counts().rename_axis(buurt_code_column).reset_index(name='Count')
+    odin_stats = pd.merge(odin_stats, counts, on=buurt_code_column, how="left", validate="one_to_one")
 
     return odin_stats
 

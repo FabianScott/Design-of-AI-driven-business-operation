@@ -67,3 +67,37 @@ province_codes = {
     12: "Limburg",
     99: "Unknown"
 }
+
+
+purpose_col_dict = {
+    1: "To home",
+    2: "Work",
+    3: "Business visit (work-related)",
+    4: "Professional",
+    5: "Pick up/drop off people",
+    6: "Pick up/drop off goods",
+    7: "Education/course",
+    8: "Shopping/groceries",
+    9: "Visit/stay over",
+    10: "Touring/walking",
+    11: "Sports/hobby",
+    12: "Other leisure activity",
+    13: "Services/personal care",
+    14: "Other purpose"
+}
+
+motive_col_dict = {
+    1: "Commute to/from work",
+    2: "Business visit (work-related)",
+    3: "Professional",
+    4: "Pick up/drop off people",
+    5: "Pick up/drop off goods",
+    6: "Education/course",
+    7: "Shopping/groceries",
+    8: "Visit/stay over",
+    9: "Touring/walking",
+    10: "Sports/hobby",
+    11: "Other leisure activity",
+    12: "Services/personal care",
+    13: "Other motive"
+}
