@@ -44,7 +44,7 @@ def get_total_inhabitants_in_buurts(df, within_mins, df_demographics=None):
     total_inhabitants = df_location[demographics_population_column].sum()
     return total_inhabitants
 
-def align_by_buurt(df_filtered, df_demographics) -> tuple[pd.DataFrame, pd.DataFrame]:
+def align_by_buurt(df_filtered: pd.DataFrame, df_demographics: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Aligns the filtered dataframe with the demographics dataframe by buurt code.
     """
@@ -66,15 +66,18 @@ def align_by_buurt(df_filtered, df_demographics) -> tuple[pd.DataFrame, pd.DataF
     df_filtered.reset_index(drop=True, inplace=True)
     df_location.reset_index(drop=True, inplace=True)
 
+    df_filtered.drop_duplicates(subset=[punt_buurt_code_column], keep='first', inplace=True)
+    df_location.drop_duplicates(subset=[demographics_buurt_code_column], keep='first', inplace=True)
+
     return df_filtered, df_location
 
 def get_total_willingness_to_cycle_in_buurts(df: pd.DataFrame, location, within_mins, mode, df_demographics=None, ):
     df_demographics = load_demograhics() if df_demographics is None else df_demographics
     df_filtered = filter_by_time(df, within_mins)
+    df_filtered, df_location = align_by_buurt(df_filtered, df_demographics)
     # Get the unique buurt codes from the filtered dataframe
     df_filtered = add_willingness_to_cycle_column(df_filtered, location, mode=mode)
     # Filter the demographics dataframe to only include the relevant buurt codes
-    df_filtered, df_location = align_by_buurt(df_filtered, df_demographics)
     total_willingness = int((df_filtered[willingness_to_cycle_column].values * df_location[demographics_population_column].values).sum())
     return total_willingness
 
@@ -97,6 +100,7 @@ def get_total_inhabitants_and_willingness(punt1, mode, within_mins, location="El
 
     df_demographics = load_demograhics()
     df_punt = load_buurt_data(punt1, mode=mode)
+    df_punt, df_demographics = align_by_buurt(df_punt, df_demographics)
     nl_total = df_demographics[demographics_population_column][0]
     
     total_inhabitants = get_total_inhabitants_in_buurts(df_punt, within_mins=within_mins, df_demographics=df_demographics)
