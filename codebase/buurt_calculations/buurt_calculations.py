@@ -99,9 +99,9 @@ def get_total_inhabitants_and_willingness(punt1, mode, within_mins, location="El
     """
 
     df_demographics = load_demograhics()
+    nl_total = df_demographics[demographics_population_column][0]
     df_punt = load_buurt_data(punt1, mode=mode)
     df_punt, df_demographics = align_by_buurt(df_punt, df_demographics)
-    nl_total = df_demographics[demographics_population_column][0]
     
     total_inhabitants = get_total_inhabitants_in_buurts(df_punt, within_mins=within_mins, df_demographics=df_demographics)
     total_willing_cyclists = get_total_willingness_to_cycle_in_buurts(
