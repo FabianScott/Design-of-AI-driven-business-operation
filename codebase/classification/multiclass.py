@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 
@@ -182,12 +183,14 @@ def run_multiclass_classification(
     return pipeline, (X_train, X_test, y_test, y_pred), accuracy 
 
 
+
 def run_transferable_classification(
         odin_df: pd.DataFrame, 
         pipeline_transferable,
         cols_for_transferable, 
         necessary_columns,
         threshold_datapoints=100, 
+
         unused_target="a_inw",
         col_car_pred = "willingness_to_car_pred",
         col_cycle_pred = "willingness_to_cycle_pred",
@@ -196,7 +199,19 @@ def run_transferable_classification(
         goal_value=7,
         motive_value=6,
         plot=True,
+        df_save_path=None, 
+        overwrite_existing=False,
     ):
+    import os
+    if df_save_path is None:
+        df_save_path = f"data/classification_results/multiclass/transferable_classification_results_{goal_value}_{motive_value}_{threshold_datapoints}.csv"
+    
+    if not df_save_path.endswith(".csv"):
+        df_save_path += ".csv"
+    if os.path.exists(df_save_path) and not overwrite_existing:
+        print(f"File {df_save_path} already exists. Loading existing results.")
+        demographics_with_predictions = pd.read_csv(df_save_path)
+        return demographics_with_predictions
     
     # Ensure the DataFrame has the necessary columns
     odin_df["BuurtCode"] = odin_df["WoPC"].astype(str)  
@@ -253,8 +268,12 @@ def run_transferable_classification(
         right_index=True
     )
 
+    os.makedirs(os.path.dirname(df_save_path), exist_ok=True)
+    demographics_with_predictions.to_csv(df_save_path, index=False)
+    print(f"Saved predictions to {df_save_path}")
+    
     if plot:
-        for col in [col_cycle_pred, col_ebike_pred, col_walk_pred]:
+        for col in [col_car_pred, col_cycle_pred, col_ebike_pred, col_walk_pred]:
             plot_value_by_buurt_heatmap(
                 demographics_with_predictions,
                 col_name=col,
@@ -262,3 +281,4 @@ def run_transferable_classification(
                 savename=f"graphics/classification_results/multiclass/transferable_{col}.png",
                 show=plot
             )
+    return demographics_with_predictions
