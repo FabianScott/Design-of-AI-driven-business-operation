@@ -190,7 +190,7 @@ def calculate_added_willingness(
     # Calculate the difference in willingness to cycle
     df_filtered["willingness_diff"] = df_filtered[new_willingness_col] - df_filtered[willingness_to_cycle_column]
     # Calculate the proportion of the difference relative to the original willingness to cycle
-    df_filtered["willingness_diff_proportion"] = (df_filtered["willingness_diff"] / df_filtered[willingness_to_cycle_column])
+    # df_filtered["willingness_diff_proportion"] = (df_filtered["willingness_diff"] / df_filtered[willingness_to_cycle_column])
     
     improvement_mask = df_filtered["willingness_diff"] > 0
     df_filtered[improvement_column] = 0

@@ -3,7 +3,7 @@ import os
 import geopandas as gpd
 import matplotlib.pyplot as plt
 
-from codebase.data.column_names import punt_travel_time_column, punt_detour_column, willingness_to_cycle_column
+from codebase.data.column_names import punt_travel_time_column, punt_detour_column, willingness_to_cycle_column, punt_buurt_code_column
 from codebase.buurt_calculations.buurt_calculations import filter_by_time, willingness_to_cycle
 from codebase.data.codebook_dicts import transport_modes
 from codebase.data.load_buurt import load_buurt_data
@@ -18,10 +18,10 @@ def plot_willingness_by_buurt_heatmap(punt2, mode, location, show=True, savename
     df_punt["buurtcode"] = df_punt["bu_code"]
     # Add the willingness to cycle % column to the dataframe
     willingness_column_name = f"{punt2}_by_{mode}_willingness"
-    df_punt[willingness_column_name] = willingness_to_cycle(df_punt[punt_travel_time_column].values, mode=mode, location=location) # gdf["aantal_inwoners"]
+    df_punt[willingness_column_name] = willingness_to_cycle(df_punt[punt_travel_time_column].values, mode=mode, location=location) * 100 # gdf["aantal_inwoners"]
     # Merge the two dataframes on the buurtcode, and fill the NaN values with 0
     gdf = gdf.merge(df_punt, on='buurtcode', how='left')
-    gdf = gdf.fillna(0)
+    # gdf = gdf.fillna(0)
 
     fig = plt.figure(figsize=(10, 10), frameon=False)
     gdf.plot(column=willingness_column_name, cmap=cmap, markersize=5, legend=True)
