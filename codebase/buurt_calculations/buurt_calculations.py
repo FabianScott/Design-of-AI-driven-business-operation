@@ -227,7 +227,7 @@ def read_all_punt_to_punt(punten, modes):
 
     return matrix_data
 
-def make_detour_matrix(matrix_data):
+def make_detour_matrix(matrix_data, savename=None):
     """
     Makes a matrix of the read all punt to punt dataframes. Takes matrix_data as input.
     """ 
@@ -269,4 +269,6 @@ def make_detour_matrix(matrix_data):
     plt.ylabel("Punt to Buurt and Mode")
     plt.xlabel("Detour Factor Bin")
     plt.tight_layout()
+    if savename:
+        plt.savefig(savename, bbox_inches='tight', dpi=300)
     plt.show()
