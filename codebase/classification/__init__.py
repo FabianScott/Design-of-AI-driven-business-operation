@@ -5,3 +5,4 @@ from .multiclass import (
     run_transferable_classification,
     get_feature_importances
 )
+from .neural_network import SktorchNN

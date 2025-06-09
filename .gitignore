@@ -4,3 +4,4 @@ data/*
 *.pyc
 history.json
 *.pt
+optimizer.pt

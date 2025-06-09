@@ -9,10 +9,11 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import Pipeline
-
+from codebase.buurt_calculations import align_by_buurt
+from codebase.data.load_buurt import load_buurt_data
 from codebase.data.load_odin import make_ml_dataset, prepare_odin_stats, odin_add_buurtcode
 from codebase.data.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_destination, filter_by_motive, transport_modes
-from codebase.data.column_names import transport_mode_col, id_col, punt_buurt_code_column
+from codebase.data.column_names import transport_mode_col, id_col, punt_buurt_code_column, punt_distance_column, demographics_buurt_code_column
 from codebase.plotting.plots import plot_confusion_matrix
 from codebase.plotting.plots import plot_value_by_buurt_heatmap
 from codebase.data.column_lists import (
@@ -22,12 +23,16 @@ from codebase.data.column_lists import (
     ordinal_cols,
     binary_cols,
 )
+from codebase.data.codebook_dicts import (
+    AfstV_to_KAfstV,
+)
 
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from skorch import NeuralNetClassifier
+import matplotlib.pyplot as plt
 
 class SktorchNN(nn.Module):
     def __init__(self, input_dim, output_dim, n_layers=2, hidden_layers=64):
@@ -211,11 +216,22 @@ def run_transferable_classification(
     if os.path.exists(df_save_path) and not overwrite_existing:
         print(f"File {df_save_path} already exists. Loading existing results.")
         demographics_with_predictions = pd.read_csv(df_save_path)
+        if plot:
+            for col in [col_car_pred, col_cycle_pred, col_ebike_pred, col_walk_pred]:
+                demographics_with_predictions["bu_code"] = demographics_with_predictions[demographics_buurt_code_column]
+                plot_value_by_buurt_heatmap(
+                    demographics_with_predictions,
+                    col_name=col,
+                    # title=f"Willingness to {col.replace('willingness_to_', '').capitalize()} by Buurt according to Transferable Model",
+                    savename=f"graphics/classification_results/multiclass/transferable_{col}.png",
+                    show=plot
+                )
+
         return demographics_with_predictions
     
     # Ensure the DataFrame has the necessary columns
-    odin_df["BuurtCode"] = odin_df["WoPC"].astype(str)  
-    odin_df[punt_buurt_code_column] = odin_df["BuurtCode"].astype(str)
+    odin_df.loc[:, "BuurtCode"] = odin_df["WoPC"].astype(str)  
+    odin_df.loc[:, punt_buurt_code_column] = odin_df["BuurtCode"].astype(str)
     # Ensure the 'WoPC' column is present and format the 'BuurtCode' column for plotting later
     stats_df = prepare_odin_stats(odin_df, buurt_code_column="BuurtCode",)
     stats_df["WoPC"] = stats_df["BuurtCode"]
@@ -225,6 +241,12 @@ def run_transferable_classification(
     # Filter the DataFrame based on the threshold for the number of trips per BuurtCode 
     mask_count = stats_df["Count"] > threshold_datapoints
     demographics = stats_df[mask_count]
+    demographics[demographics_buurt_code_column] = demographics[punt_buurt_code_column]
+    # Make the AfstV and KAfstV columns by aligning with the punt data and using its distance column
+    df_punt = load_buurt_data(mode="fiets", punt1="basis")
+    df_punt, demographics = align_by_buurt(df_punt, demographics)
+    demographics["AfstV"] = df_punt[punt_distance_column].values
+    demographics["KAfstV"] = df_punt[punt_distance_column].apply(AfstV_to_KAfstV).values  
     # Set the goal and motive values
     demographics.loc[:, "Doel"] = goal_value         # Education
     demographics.loc[:, "KMotiefV"] = motive_value   # Education
@@ -254,6 +276,7 @@ def run_transferable_classification(
     predicted_probs = pipeline_transferable.predict_proba(demographics_ml_X)
     # Create a DataFrame with the predictions
     demographics_ml_with_predictions = demographics_ml_X.copy()
+
     demographics_ml_with_predictions[transport_mode_col + "_pred"] = np.argmax(predicted_probs, axis=1)
     demographics_ml_with_predictions[col_car_pred] = predicted_probs[:, 0]  # Assuming index 0 corresponds to car
     demographics_ml_with_predictions[col_cycle_pred] = predicted_probs[:, 1]  # Assuming index 1 corresponds to cycling
@@ -274,6 +297,7 @@ def run_transferable_classification(
     
     if plot:
         for col in [col_car_pred, col_cycle_pred, col_ebike_pred, col_walk_pred]:
+            demographics_with_predictions["bu_code"] = demographics_with_predictions[demographics_buurt_code_column]
             plot_value_by_buurt_heatmap(
                 demographics_with_predictions,
                 col_name=col,
