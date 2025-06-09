@@ -643,7 +643,7 @@ def apply_ignore_rules(df: pd.DataFrame, rules: dict) -> pd.DataFrame:
             mask = rule(df[col])
         else:                           # treat it as a list / set of values
             mask = df[col].isin(rule)
-        df.loc[mask, col] = np.nan
+        # df.loc[mask, col] = np.nan
     return df
 
 
