@@ -81,6 +81,7 @@ def plot_value_by_buurt_heatmap(df_punt, col_name, show=True, savename=None, cma
     plt.title(f"Heatmap of {col_name} by Buurt")
     plt.axis("off")
     plt.tight_layout()
+    plt.legend(loc='upper right', fontsize='small')
     if savename is not None:
         os.makedirs(os.path.dirname(savename), exist_ok=True)
         plt.savefig(savename, bbox_inches='tight', dpi=300)
