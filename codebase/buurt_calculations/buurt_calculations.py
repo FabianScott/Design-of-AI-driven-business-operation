@@ -207,6 +207,7 @@ def calculate_added_willingness(
             savename=savename, 
             cmap='viridis'
         )
+        plt.savefig('ExtraInhabits', dpi=300, bbox_inches='tight')
     return df_filtered
 
 
