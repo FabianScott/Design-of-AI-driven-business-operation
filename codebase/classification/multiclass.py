@@ -157,6 +157,7 @@ def run_multiclass_classification(
         test_size=test_size,
         group_col=id_col,
         y_translation=y_translation,
+        dropna=False,
     )
     
     
@@ -224,7 +225,8 @@ def run_transferable_classification(
                     col_name=col,
                     # title=f"Willingness to {col.replace('willingness_to_', '').capitalize()} by Buurt according to Transferable Model",
                     savename=f"graphics/classification_results/multiclass/transferable_{col}.png",
-                    show=plot
+                    show=plot,
+                    as_percentage=True,
                 )
 
         return demographics_with_predictions

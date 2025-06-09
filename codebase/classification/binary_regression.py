@@ -105,3 +105,15 @@ def run_binary_regression(
         plot_binary_regression(X_test, y_test, y_pred, transport_modes_predict, motives, savename=savename)
 
     return pipeline, (X_train, X_test, y_test, y_pred)
+
+def binary_pipeline_as_willingness_function(time_array, pipeline, **kwargs):
+    """
+    Returns the willingness to pay for a given time array.
+    """
+    # Convert time_array to DataFrame with appropriate feature names
+    df_time = pd.DataFrame(time_array, columns=pipeline.feature_names_in_)
+    
+    # Predict probabilities using the pipeline
+    probabilities = pipeline.predict_proba(df_time)[:, 1]
+    
+    return probabilities

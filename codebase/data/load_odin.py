@@ -237,7 +237,8 @@ def make_ml_dataset(
         stratification_col=None, 
         group_col=None, 
         y_translation: dict=None,
-        ensure_common_labels: bool = True
+        ensure_common_labels: bool = True,
+        dropna=False,
         ) -> tuple:
     """
     Splits the dataset into training and testing sets.
@@ -254,7 +255,7 @@ def make_ml_dataset(
     df_: pd.DataFrame = df.drop(columns=drop_cols_to_use, errors='ignore')
 
     # Check for NaN values in the dataframe
-    if df_.isnull().values.any():
+    if dropna and df_.isnull().values.any():
         print(f"Dataframe contains NaN values in columns: {df_.columns[df_.isnull().any()].tolist()}")
         print("Warning: These will be dropped.")
         df_ = df_.dropna(axis=0)

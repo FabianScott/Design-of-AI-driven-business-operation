@@ -1,7 +1,7 @@
 import json
 import numpy as np
 
-def willingness_to_cycle(tij, location, mode="fiets", param_path=None):
+def willingness_to_cycle(tij, location, mode="fiets", param_path=None, **kwargs):
     """
     Calculate the willingness to cycle based on travel time and location.
 
