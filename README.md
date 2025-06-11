@@ -31,7 +31,7 @@ This project explores the application of AI and data-driven methods to analyze a
    ```
 
 3. **Data**
-   - Since the ODIN and punt_tot_punt data was shared with us through the TUe canvas page, we cannot provide a script that downloads, unzips and places the files in the right place. Instead you will simply have to make sure that the files are placed in the datafolder. In addition you will need the following file: https://geodata.cbs.nl/files/Wijkenbuurtkaart/WijkBuurtkaart_2023_v2.zip and the "buurt_to_PC_mapping.csv"
+   - Since the ODIN and punt_tot_punt data was shared with us through the TUe canvas page, we cannot provide a script that downloads, unzips and places the files in the right place. Instead you will simply have to make sure that the files are placed in the datafolder. In addition you will need the following file: https://geodata.cbs.nl/files/Wijkenbuurtkaart/WijkBuurtkaart_2023_v2.zip and the "buurt_to_PC_mapping.csv" from https://www.cbs.nl/nl-nl/maatwerk/2023/35/buurt-wijk-en-gemeente-2023-voor-postcode-huisnummer 
 
 ## Usage
 
