@@ -3,3 +3,5 @@ data/*
 !data/demographics/
 *.pyc
 history.json
+*.pt
+optimizer.pt

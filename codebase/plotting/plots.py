@@ -67,7 +67,16 @@ def plot_binary_regression(X_test, y_test, y_pred, transport_modes_predict, dest
         plt.savefig(savename, dpi=300)
     plt.show()
 
-def plot_value_by_buurt_heatmap(df_punt, col_name, show=True, savename=None, cmap='viridis'):
+def plot_value_by_buurt_heatmap(
+        df_punt, 
+        col_name, 
+        show=True, 
+        savename=None, 
+        cmap='viridis',
+        max_val=None,
+        min_val=None,
+        as_percentage=False,
+        ):
     gdf = gpd.read_file("data/WijkBuurtkaart_2023_v2/wijkenbuurten_2023_v2.gpkg", layer="buurten")
     # Remove the empty buurts
     gdf = gdf[gdf["aantal_inwoners"] > 0]
@@ -76,7 +85,16 @@ def plot_value_by_buurt_heatmap(df_punt, col_name, show=True, savename=None, cma
     gdf = gdf.merge(df_punt, on='buurtcode', how='left')
 
     fig = plt.figure(figsize=(10, 10), frameon=False)
-    gdf.plot(column=col_name, cmap=cmap, markersize=5, legend=True, missing_kwds={"color": "lightgrey", "label": "No data"})
+    if as_percentage:
+        # Convert the column to percentage
+        gdf[col_name] = gdf[col_name] * 100
+        if max_val is None:
+            max_val = 100
+        if min_val is None:
+            min_val = 0
+
+    gdf.plot(column=col_name, cmap=cmap, markersize=5, legend=True, missing_kwds={"color": "lightgrey", "label": "No data"},
+             vmin=min_val, vmax=max_val)
 
     plt.title(f"Heatmap of {col_name} by Buurt")
     plt.axis("off")

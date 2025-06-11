@@ -1,3 +1,4 @@
+import numpy as np
 # KHvm
 transport_modes = {
     1: "Passenger car",
@@ -101,3 +102,29 @@ motive_col_dict = {
     12: "Services/personal care",
     13: "Other motive"
 }
+
+def AfstV_to_KAfstV(meters):
+    km = meters / 1000
+    # Define the upper bounds for the ranges (excluding last open-ended)
+    bounds = np.array([0.5, 1.0, 2.5, 3.7, 5.0, 7.5, 10, 15, 20, 30, 40, 50, 75, 100])
+    # Find the first index where km is less than the bound
+    index = np.searchsorted(bounds, km, side='right')
+    
+    # Range comments:
+    # 1: 0.1–0.5 km
+    # 2: 0.5–1.0 km
+    # 3: 1.0–2.5 km
+    # 4: 2.5–3.7 km
+    # 5: 3.7–5.0 km
+    # 6: 5.0–7.5 km
+    # 7: 7.5–10 km
+    # 8: 10–15 km
+    # 9: 15–20 km
+    #10: 20–30 km
+    #11: 30–40 km
+    #12: 40–50 km
+    #13: 50–75 km
+    #14: 75–100 km
+    #15: 100 km or more
+
+    return index + 1 if index < 14 else 15
