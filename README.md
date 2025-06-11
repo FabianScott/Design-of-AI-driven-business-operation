@@ -1,6 +1,6 @@
 # Design of AI-driven Business Operation
 
-This project explores the application of AI and data-driven methods to analyze and optimize business operations, with a focus on transportation, demographics, and spatial data in the Netherlands. The repository contains code for data loading, preprocessing, analysis, and visualization, as well as Jupyter notebooks for various research topics. The use of heatmaps for various metrics across the country is heavily employed, such as the following example of the number of extra inhabitants willing to cycle to Elementary School if the neighbourhoods with the largest detour factors had them reduced by 20 %:
+This project explores the application of AI and data-driven methods to analyze and optimize business operations, with a focus on transportation, demographics, and spatial data in the Netherlands. The repository contains code for data loading, preprocessing, analysis, and visualization, as well as Jupyter notebooks for various research topics. The use of heatmaps for various metrics across the country is heavily employed, such as the following example of the number of extra inhabitants willing to cycle to Elementary School if the neighbourhoods with the largest detour factors had them reduced by 50 %:
 
 ![Heatmap of extra inhabitants willing to cycle](graphics/nl_maps/added_willingness_to_cycle_fiets_basis.png)
 
