@@ -1,5 +1,5 @@
 import pandas as pd
-from codebase.data.column_names import transport_mode_col, distance_col
+from codebase.data.column_names import punt_buurt_code_column, punt_travel_time_column, transport_mode_col, distance_col
 from codebase.data.codebook_dicts import transport_modes, trip_motives, level_mapping_suffix
 
 def filter_by_mode_and_category(df: pd.DataFrame, mode, category):
@@ -56,3 +56,13 @@ def filter_by_motive(df: pd.DataFrame, motives):
     """
     filtered_df = df[df["KMotiefV"].isin(motives)]
     return filtered_df
+
+
+# Helper functions:
+def filter_by_time(df: pd.DataFrame, max_time) -> pd.DataFrame:
+    """Filters by travel time and removes duplicates based on bu_code, keeping the smallest value."""
+    df_filtered: pd.DataFrame = df[df[punt_travel_time_column] <= max_time]
+    df_filtered = df_filtered.sort_values(by=punt_travel_time_column, ascending=True, )
+    df_filtered[punt_buurt_code_column] = df_filtered[punt_buurt_code_column].astype(str)
+    df_filtered = df_filtered.drop_duplicates(subset=['bu_code'], keep='first', )
+    return df_filtered

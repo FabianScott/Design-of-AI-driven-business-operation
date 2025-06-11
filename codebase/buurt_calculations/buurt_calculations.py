@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from codebase.data.filters import filter_by_time
 from codebase.data.load_demographics import load_demograhics
 from .willingness import willingness_to_cycle
 from codebase.data.load_buurt import load_buurt_data
@@ -14,15 +15,6 @@ from codebase.data.column_names import (
     punt_detour_column,
 )
 
-
-# Helper functions:
-def filter_by_time(df: pd.DataFrame, max_time) -> pd.DataFrame:
-    """Filters by travel time and removes duplicates based on bu_code, keeping the smallest value."""
-    df_filtered: pd.DataFrame = df[df[punt_travel_time_column] <= max_time]
-    df_filtered = df_filtered.sort_values(by=punt_travel_time_column, ascending=True, )
-    df_filtered[punt_buurt_code_column] = df_filtered[punt_buurt_code_column].astype(str)
-    df_filtered = df_filtered.drop_duplicates(subset=['bu_code'], keep='first', )
-    return df_filtered
 
 def get_buurt_ids(df: pd.DataFrame) -> list:
     df_buurt = df[[punt_buurt_code_column]].astype(str)
@@ -210,23 +202,6 @@ def calculate_added_willingness(
         plt.savefig('ExtraInhabits', dpi=300, bbox_inches='tight')
     return df_filtered
 
-
-def read_all_punt_to_punt(punten, modes):
-    """
-    Reads all punt to punt files defined in the list of punt names and modes.
-    """
-    matrix_data = {}
-
-    for punt in punten:
-        for mode in modes:
-            key = f"{punt}_{mode}"
-            try:
-                df = load_buurt_data(punt, mode)
-                matrix_data[key] = df.copy()
-            except Exception as e:
-                print(f"Skipping {key}: {e}")
-
-    return matrix_data
 
 def make_detour_matrix(matrix_data, savename=None):
     """

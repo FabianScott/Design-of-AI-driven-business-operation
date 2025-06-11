@@ -4,6 +4,10 @@ This project explores the application of AI and data-driven methods to analyze a
 
 ![Heatmap of extra inhabitants willing to cycle](graphics/nl_maps/added_willingness_to_cycle_fiets_basis.png)
 
+The main recommendation for increasing the number of people willing to cycle to their educational institutions is increasing e-bike speeds. To estimate this, we find the actual average speeds of ebikes and pedelecs. Ebikes have a speed limit of 25 km/h, but an average speed of 21 km/h, whereas pedelecs have a speed limit of 45 km/h and an average speed of 28.8. Using this we interpolate the average speed that would be achieved at hypothetical new speed limits from 26 km/h to 45 km/h for ebikes. From this we estimate ~1.5 million new people would be willing to ebike if the speed limit is increased to 45 km/h.
+
+![Number of extra people willing to cycle per km/h increase in the speed limit](graphics/population_willingness_to_cycle_ebike_speeds_hbo_wo.png)
+0
 ## Project Structure
 
 - `Topic1/`, `Topic2/`, `Topic3/`  
@@ -51,10 +55,10 @@ See [codebase/__init__.py](codebase/__init__.py) for available imports.
 
 ## Main Features
 
-- **Data Loading:** Utilities for loading demographic, spatial, and transportation datasets.
+- **Data Loading:** Utilities for loading the various datasets.
 - **Preprocessing:** Filtering, cleaning, and mapping of data (e.g., postcode to neighborhood).
 - **Analysis:** Functions for calculating willingness to cycle, detour factors, and classification models.
-- **Visualization:** Plotting functions for heatmaps, confusion matrices, and spatial data.
+- **Visualization:** Plotting functions for geospatial data heatmaps and confusion matrices.
 
 ## License
 

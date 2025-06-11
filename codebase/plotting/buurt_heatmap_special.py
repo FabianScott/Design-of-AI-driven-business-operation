@@ -4,8 +4,9 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 
 from codebase.data.column_names import punt_travel_time_column, punt_detour_column, willingness_to_cycle_column, punt_buurt_code_column
-from codebase.buurt_calculations.buurt_calculations import filter_by_time, willingness_to_cycle
+from codebase.buurt_calculations.buurt_calculations import willingness_to_cycle
 from codebase.data.codebook_dicts import transport_modes
+from codebase.data.filters import filter_by_time
 from codebase.data.load_buurt import load_buurt_data
 
 def plot_willingness_by_buurt_heatmap(

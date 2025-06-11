@@ -1,10 +1,11 @@
+from ..data.load_buurt import read_all_punt_to_punt
+from ..data.filters import filter_by_time
 from .buurt_calculations import (
     demographics_population_column,
     demographics_buurt_code_column,
     punt_travel_time_column,
     punt_buurt_code_column,
     willingness_to_cycle_column,
-    filter_by_time,
     get_buurt_ids,
     add_willingness_to_cycle_column,
     get_total_inhabitants_in_buurts,
@@ -13,7 +14,6 @@ from .buurt_calculations import (
     align_by_buurt,
     calculate_added_willingness,
     number_of_residents_in_detour,
-    read_all_punt_to_punt,
     make_detour_matrix
 )
 
