@@ -16,8 +16,9 @@ def load_excel(filename):
 
     if os.path.exists(filename_csv) and filename.endswith("csv"):
         # Check if the file is a CSV file and load it directly
-        df = pd.read_csv(filename_csv, sep=";", low_memory=False)
+        df = pd.read_csv(filename_csv, sep=";", encoding='latin1', low_memory=False)
         print("Loaded file from CSV")
+
     else:
         df = pd.read_excel(filename_excel, engine="openpyxl", )
         df.to_csv(filename_csv, sep=";", index=False)

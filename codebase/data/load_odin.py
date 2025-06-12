@@ -10,6 +10,9 @@ from codebase.data.column_lists import (
     numerical_cols, ordinal_cols, categorical_cols, binary_cols
 )
 
+import os
+import pandas as pd
+
 def load_odin(years=None, only_one_mode=True, do_apply_ignore_rules=True, dropna=False):
     """
     Reads and concatenates ODiN data for the specified years via load_excel().
@@ -20,6 +23,8 @@ def load_odin(years=None, only_one_mode=True, do_apply_ignore_rules=True, dropna
     if years is None:
         years = [2019, 2020, 2021, 2022, 2023]
 
+    print(f"[INFO] Loading ODiN data for years: {years}")
+
     odin_dfs = []
     for year in years:
         base_folder = os.path.join("data", "OdiN 2019-2023", f"OdiN {year}")
@@ -27,20 +32,37 @@ def load_odin(years=None, only_one_mode=True, do_apply_ignore_rules=True, dropna
         if year in [2019, 2020]:
             filename = filename.replace("Databestand", "Databestand_v2.0")
         odin_path = os.path.join(base_folder, filename)
+
+        print(f"[INFO] Reading file: {odin_path}")
         df_year = load_excel(odin_path)
+        print(f"[INFO] Loaded {len(df_year):,} rows for {year}")
+
         odin_dfs.append(df_year)
+
     odin_df = pd.concat(odin_dfs, ignore_index=True)
-    
+    print(f"[INFO] Total rows after concatenation: {len(odin_df):,}")
+
     if only_one_mode:
+        before = len(odin_df)
         odin_df = odin_df[odin_df["Verpl"] == 1]
-    
+        after = len(odin_df)
+        print(f"[FILTER] Only-one-mode trips: {after:,} rows (filtered {before - after:,})")
+
     if do_apply_ignore_rules:
+        before = len(odin_df)
         odin_df = apply_ignore_rules(odin_df, IGNORE_RULES)
+        after = len(odin_df)
+        print(f"[FILTER] After ignore rules: {after:,} rows (filtered {before - after:,})")
 
     if dropna:
+        before_cols = odin_df.shape[1]
         odin_df = odin_df.dropna(axis=1, how='any')
+        after_cols = odin_df.shape[1]
+        print(f"[CLEAN] Dropped columns with NaNs: {before_cols - after_cols} columns removed")
 
+    print(f"[DONE] Final dataset shape: {odin_df.shape}")
     return odin_df
+
 
 def odin_add_buurtcode(odin_df, mapping_path="data/buurt_to_PC_mapping.csv", buurt_code_column="BuurtCode"):
     """

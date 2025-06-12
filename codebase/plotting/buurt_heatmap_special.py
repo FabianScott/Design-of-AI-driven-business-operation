@@ -18,6 +18,7 @@ def plot_willingness_by_buurt_heatmap(
         cmap='viridis', 
         willingness_function=willingness_to_cycle,
         multiply_by_population=False,
+        transport_mode_str=None,
         pipeline=None,
         max_val=100,
         min_val=0,
@@ -48,7 +49,7 @@ def plot_willingness_by_buurt_heatmap(
     fig = plt.figure(figsize=(10, 10), frameon=False)
     gdf.plot(column=willingness_column_name, cmap=cmap, markersize=5, legend=True, vmin=min_val, vmax=max_val)
     title_vehicle = "cycle" if title_vehicle is None else title_vehicle
-    plt.title(f"Heatmap of willingness to {title_vehicle} to {punt2} by {mode} in %")
+    plt.title(f"Heatmap of willingness to {transport_mode_str} to {punt2} in %")
     plt.axis("off")
     plt.tight_layout()
     if savename is not None:
