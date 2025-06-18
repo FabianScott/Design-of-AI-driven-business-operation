@@ -6,3 +6,7 @@ matplotlib
 openpyxl
 scikit-learn
 seaborn
+torch
+jupyter
+tqdm
+skorch
