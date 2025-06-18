@@ -22,6 +22,7 @@ from .municipality_calculations import (                 # new names
     load_municipality_geometry,
     population_weighted_detour,
     detour_vs_population,
+    weighted_detour_by_municipality,
 )
 from .willingness import willingness_to_cycle
 

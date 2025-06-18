@@ -39,6 +39,28 @@ def population_weighted_detour(trips: pd.DataFrame,
     result["municipality_name"] = result["municipality_name"].str.title()
     return result
 
+def weighted_detour_by_municipality(trips: pd.DataFrame,
+                                    demo:  pd.DataFrame) -> pd.DataFrame:
+    """
+    Population-weighted mean detour factor per municipality.
+    Returns DataFrame ['gm_naam', 'pop_weighted_detour'].
+    """
+    merged = (
+        trips.merge(
+            demo[["gwb_code", "gm_naam", "a_inw"]],
+            left_on="bu_code", right_on="gwb_code",
+            how="left", validate="many_to_one")
+          .dropna(subset=["a_inw"])
+    )
+
+    w = (
+        merged.groupby("gm_naam")
+              .apply(lambda x: (x["omrijdfactor"] * x["a_inw"]).sum()
+                               / x["a_inw"].sum())
+              .reset_index(name="pop_weighted_detour")
+    )
+    w["gm_naam"] = w["gm_naam"].str.title()
+    return w
 
 def detour_vs_population(trips: pd.DataFrame,
                          demographics: pd.DataFrame) -> pd.DataFrame:
