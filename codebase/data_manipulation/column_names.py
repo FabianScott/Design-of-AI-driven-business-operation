@@ -10,7 +10,8 @@ punt_buurt_code_column = 'bu_code'
 willingness_to_cycle_column = 'willingness_to_cycle_percentage'
 punt_detour_column = 'omrijdfactor'
 punt_distance_column = 'reisafstand_m'
-
+municipality_name_column = 'gm_naam'
+geofile_population_column = "aantal_inwoners"
 
 # Columns for ODIN
 distance_col = "AfstV"          # Distance column in the dataframe

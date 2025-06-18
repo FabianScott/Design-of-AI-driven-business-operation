@@ -1,6 +1,6 @@
 import numpy as np
 # KHvm
-transport_modes = {
+transport_modes_dict = {
     1: "Passenger car",
     2: "Train",
     3: "Bus",

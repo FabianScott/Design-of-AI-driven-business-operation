@@ -5,11 +5,11 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 from scipy.stats import binned_statistic
 
-from codebase.data.column_names import distance_col, punt_buurt_code_column
-from codebase.data.codebook_dicts import trip_motives, transport_modes
+from codebase.data_manipulation.column_names import distance_col, punt_buurt_code_column
+from codebase.data_manipulation.codebook_dicts import trip_motives, transport_modes_dict
 
 
-def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', show=True, savename=None):
+def plot_confusion_matrix(cm, classes, title='Confusion Matrix', cmap='Blues', show=True, savename=None):
     """
     Plots a confusion matrix using matplotlib and seaborn.
 
@@ -26,7 +26,7 @@ def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', sh
 
     plt.figure(figsize=(len(cm), len(cm)))
     sns.heatmap(cm, annot=True, fmt='d', cmap=cmap,
-                xticklabels=labels, yticklabels=labels)
+                xticklabels=classes, yticklabels=classes)
     plt.title(title)
     plt.xlabel('Predicted')
     plt.ylabel('True')
@@ -41,7 +41,7 @@ def plot_confusion_matrix(cm, labels, title='Confusion Matrix', cmap='Blues', sh
 def plot_binary_regression(X_test, y_test, y_pred, transport_modes_predict, destinations, savename=None):
     # Bin settings
     bins = 50
-    transport_mode_str = ", ".join([transport_modes[mode] for mode in transport_modes_predict])
+    transport_mode_str = ", ".join([transport_modes_dict[mode] for mode in transport_modes_predict])
 
     # Compute average actual cycling per bin
     bin_means, bin_edges, _ = binned_statistic(X_test[distance_col].values.flatten(), y_test.values.flatten(), statistic='mean', bins=bins)

@@ -7,9 +7,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
 
-from codebase.data.load_odin import make_ml_dataset
-from codebase.data.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_destination, filter_by_motive, transport_modes
-from codebase.data.column_names import transport_mode_col, distance_col, id_col
+from codebase.data_loading.ml_dataloading import make_ml_dataset
+from codebase.data_manipulation.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_destination, filter_by_motive, transport_modes_dict
+from codebase.data_manipulation.column_names import transport_mode_col, distance_col, id_col
 from codebase.plotting.plots import plot_binary_regression
 
 
@@ -37,7 +37,7 @@ def run_binary_regression(
     df : pd.DataFrame
         The input dataframe containing the data.
     transport_modes : list[int], optional
-        The transport modes to predict. Default is 5 (Bicycle).
+        The transport modes to predict, one model is trained for each entry in the list. Default is 5 (Bicycle).
     test_size : float, optional
         The proportion of the dataset to include in the test split. Default is 0.02.
     max_dist : int, optional

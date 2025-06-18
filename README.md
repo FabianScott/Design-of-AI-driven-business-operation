@@ -7,11 +7,19 @@ This project explores the application of AI and data-driven methods to analyze a
 The main recommendation for increasing the number of people willing to cycle to their educational institutions is increasing e-bike speeds. To estimate this, we find the actual average speeds of ebikes and pedelecs. Ebikes have a speed limit of 25 km/h, but an average speed of 21 km/h, whereas pedelecs have a speed limit of 45 km/h and an average speed of 28.8. Using this we interpolate the average speed that would be achieved at hypothetical new speed limits from 26 km/h to 45 km/h for ebikes. From this we estimate ~1.5 million new people would be willing to ebike if the speed limit is increased to 45 km/h.
 
 ![Number of extra people willing to cycle per km/h increase in the speed limit](graphics/population_willingness_to_cycle_ebike_speeds_hbo_wo.png)
-0
+
+For a simple introduction to using the tools in this repository, look at the following notebooks:
+- `Topic1/choropleths_and_willingness.ipynb` for how to create choropleths (geographical heatmaps) and calculate willingness to cycle
+- `Topic1/top_detour.ipynb` for extensive analysis for finding the places where most people are the most affected by detours
+- `Topic2/decision_tree_demo.ipynb` for an introduction to the dataloading for ml
+- `Topic2/*` for notebooks producing classification results
+- `Topic3/ebike_speeds` for the calculation of the impact of changing the legal maximum speed on potential ridership
+
+
 ## Project Structure
 
 - `Topic1/`, `Topic2/`, `Topic3/`  
-  Jupyter notebooks for each topic. Together they form the enterity of the analysis performed in this project.
+  Jupyter notebooks for each topic. Together they form the enterity of the analysis performed in this project. These notebooks will can skip training models if results are available and you wish to do so.
 - `codebase/`  
   Core Python package with modules for data loading, calculations, classification, and plotting.
 - `data/`  

@@ -5,8 +5,8 @@ import sys
 
 
 
-from codebase.data.load_demographics import load_excel
-from codebase.data.column_lists import (
+from codebase.data_loading.load_demographics import load_excel
+from codebase.data_manipulation.column_lists import (
     numerical_cols, ordinal_cols, categorical_cols, binary_cols
 )
 
@@ -89,6 +89,7 @@ def odin_add_buurtcode(odin_df, mapping_path="data/buurt_to_PC_mapping.csv", buu
     odin_df.drop(columns=["WoPC4"], inplace=True)
 
     return odin_df
+
 
 def clean_aggregate_numord(odin_df, numerical_cols, ordinal_cols):
     """
@@ -245,88 +246,6 @@ def prepare_odin_stats(odin_df, buurt_code_column="BuurtCode"):
 
     return odin_stats
 
-
-
-
-def make_ml_dataset(
-        df: pd.DataFrame, 
-        target_col, 
-        drop_cols, 
-        categorical_cols=None, 
-        target_vals=None, 
-        test_size=0.2, 
-        random_state=42, 
-        stratification_col=None, 
-        group_col=None, 
-        y_translation: dict=None,
-        ensure_common_labels: bool = True,
-        dropna=False,
-        ) -> tuple:
-    """
-    Splits the dataset into training and testing sets.
-    """
-
-    from sklearn.model_selection import train_test_split
-    from sklearn.model_selection import GroupShuffleSplit
-
-    if stratification_col is not None and group_col is not None:
-        raise ValueError("Cannot use both stratification_col and group_col for splitting.")
-
-    # Drop specified columns
-    drop_cols_to_use = [col for col in drop_cols if (col in df.columns) and not col == group_col] if drop_cols else []
-    df_: pd.DataFrame = df.drop(columns=drop_cols_to_use, errors='ignore')
-
-    # Check for NaN values in the dataframe
-    if dropna and df_.isnull().values.any():
-        print(f"Dataframe contains NaN values in columns: {df_.columns[df_.isnull().any()].tolist()}")
-        print("Warning: These will be dropped.")
-        df_ = df_.dropna(axis=0)
-
-    # Split the data into features and target
-    X = df_.drop(columns=[target_col])
-    categorical_cols_to_use = [col for col in categorical_cols if col in X.columns] if categorical_cols else []
-    X = pd.get_dummies(X, columns=categorical_cols_to_use, drop_first=True, dtype=np.int64)
-    # Cast all non categorical columns to float
-    X = X.astype({col: float for col in X.columns if col.split("_")[0] not in categorical_cols_to_use})
-    y: pd.DataFrame = df_[target_col].isin(target_vals) if target_vals is not None else df_[target_col]
-    y = y.astype(np.int64)
-    if y_translation:
-        y = y.map(y_translation).fillna(0).astype(np.int64)
-    stratification = df_[stratification_col] if stratification_col else None
-
-    # Split the data into training and testing sets
-    if group_col:
-        gss = GroupShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)
-        train_idx, test_idx = next(gss.split(X, y, groups=df_[group_col]))
-        X.drop(columns=[group_col], inplace=True, errors='ignore')
-        X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
-        y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
-    else:
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=stratification)
-
-    if ensure_common_labels:
-        # 1. Find the set of labels that occur in both y_train and y_test
-        common_labels = np.intersect1d(np.unique(y_train), np.unique(y_test))
-
-        print(f"Common labels: {common_labels}")
-
-        # 2. Create boolean masks
-        train_mask = y_train.isin(common_labels)
-        test_mask = y_test.isin(common_labels)
-
-        # 3. Filter both sets
-        X_train = X_train[train_mask]
-        y_train = y_train[train_mask]
-        X_test = X_test[test_mask]
-        y_test = y_test[test_mask]
-
-    return X_train, X_test, y_train, y_test
-
-# ---------------------------------------------------------------------------
-# 1.  Put this helper at module level (or in a small utils-file)
-# ---------------------------------------------------------------------------
-import numpy as np
-import pandas as pd
 
 def apply_ignore_rules(df: pd.DataFrame, rules: dict) -> pd.DataFrame:
     """

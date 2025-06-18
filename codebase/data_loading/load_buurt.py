@@ -1,4 +1,5 @@
 import pandas as pd
+from tqdm import tqdm
 
 
 def load_buurt_data(punt1, mode) -> pd.DataFrame:
@@ -14,7 +15,7 @@ def read_all_punt_to_punt(punten, modes):
     """
     matrix_data = {}
 
-    for punt in punten:
+    for punt in tqdm(punten, desc="Loading punt to punt data"):
         for mode in modes:
             key = f"{punt}_{mode}"
             try:

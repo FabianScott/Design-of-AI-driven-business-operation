@@ -1,18 +1,22 @@
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from codebase.data.filters import filter_by_time
-from codebase.data.load_demographics import load_demograhics
+from codebase.buurt_calculations.municipality_calculations import weighted_detour_by_municipality
+from codebase.data_manipulation.filters import filter_by_time
+from codebase.data_loading.load_demographics import load_demograhics
+from codebase.plotting.municipality_heatmap import plot_detour_map
 from .willingness import willingness_to_cycle
-from codebase.data.load_buurt import load_buurt_data
-from codebase.data.column_names import (
+from codebase.data_loading.load_buurt import load_buurt_data, read_all_punt_to_punt
+from codebase.data_manipulation.column_names import (
     demographics_population_column,
     demographics_buurt_code_column,
     punt_travel_time_column,
     punt_buurt_code_column,
     willingness_to_cycle_column,
     punt_detour_column,
+    geofile_population_column
 )
 
 
@@ -248,3 +252,39 @@ def make_detour_matrix(matrix_data, savename=None):
     if savename:
         plt.savefig(savename, bbox_inches='tight', dpi=300)
     plt.show()
+
+
+def calculate_population_weighted_detour(
+    category: str,
+    modes: tuple[str, ...],
+    gpkg:   Path = Path("data\WijkBuurtkaart_2023_v2\wijkenbuurten_2023_v2.gpkg"),
+    out_csv: Path = Path("data/detour_result.csv"),
+    top_n: int = None,
+    make_map: bool = True,
+    population_threshold: int = 0,
+    overwrite: bool = False,
+) -> None:
+    if out_csv.exists() and not overwrite:
+        det = pd.read_csv(out_csv)
+        print(f"Loaded existing CSV from {out_csv}")
+    else:
+        matrices = read_all_punt_to_punt([category], list(modes))
+        if not matrices:
+            raise FileNotFoundError("No matching punt→buurt files found")
+        trips = pd.concat(matrices.values(), ignore_index=True)
+        demo = load_demograhics()
+        
+        det = weighted_detour_by_municipality(trips, demo)
+        det.to_csv(out_csv, index=False)
+        print(f"CSV saved to {out_csv}")
+    
+    if top_n is not None:
+        print(f"Top {top_n} municipalities by population-weighted detour factor:")
+        det_pop_min_removed = det.sort_values(by="pop_weighted_detour", ascending=False)
+        det_pop_min_removed = det_pop_min_removed[det_pop_min_removed[geofile_population_column] > population_threshold]
+        print(det_pop_min_removed.nlargest(top_n, "pop_weighted_detour"))
+    
+    if make_map:
+        plot_detour_map(det, category, modes, gpkg, population_threshold=population_threshold)
+    
+    return det
