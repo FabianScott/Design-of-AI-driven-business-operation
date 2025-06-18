@@ -10,20 +10,21 @@ from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import Pipeline
 from codebase.buurt_calculations import align_by_buurt
-from codebase.data.load_buurt import load_buurt_data
-from codebase.data.load_odin import make_ml_dataset, prepare_odin_stats, odin_add_buurtcode
-from codebase.data.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_destination, filter_by_motive, transport_modes
-from codebase.data.column_names import transport_mode_col, id_col, punt_buurt_code_column, punt_distance_column, demographics_buurt_code_column
+from codebase.data_loading.load_buurt import load_buurt_data
+from codebase.data_loading.load_odin import prepare_odin_stats, odin_add_buurtcode
+from codebase.data_manipulation.filters import filter_by_distance_and_duration, filter_by_origin, filter_by_destination, filter_by_motive, transport_modes_dict
+from codebase.data_manipulation.column_names import transport_mode_col, id_col, punt_buurt_code_column, punt_distance_column, demographics_buurt_code_column
+from codebase.data_loading.ml_dataloading import make_ml_dataset
 from codebase.plotting.plots import plot_confusion_matrix
 from codebase.plotting.plots import plot_value_by_buurt_heatmap
-from codebase.data.column_lists import (
+from codebase.data_manipulation.column_lists import (
     drop_cols, 
     numerical_cols,
     categorical_cols,
     ordinal_cols,
     binary_cols,
 )
-from codebase.data.codebook_dicts import (
+from codebase.data_manipulation.codebook_dicts import (
     AfstV_to_KAfstV,
 )
 
@@ -177,14 +178,14 @@ def run_multiclass_classification(
         y_test = y_test.map(y_translation_reverse).values
         y_pred = pd.Series(y_pred, ).map(y_translation_reverse).values
     
-    transport_modes_plot = {k: v for k, v in transport_modes.items() if k in np.unique(y_test)}
+    transport_modes_plot = {k: v for k, v in transport_modes_dict.items() if k in np.unique(y_test)}
     classification_report_ = classification_report(y_test, y_pred, target_names=transport_modes_plot.values())
     print(classification_report_)
     accuracy = np.mean(y_pred == y_test)
 
     if plot:
         cm = confusion_matrix(y_test, y_pred)
-        plot_confusion_matrix(cm, labels=transport_modes_plot.values(), title=plot_title, savename=savename)
+        plot_confusion_matrix(cm, classes=transport_modes_plot.values(), title=plot_title, savename=savename)
 
     return pipeline, (X_train, X_test, y_test, y_pred), accuracy 
 

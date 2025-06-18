@@ -3,11 +3,10 @@ import os
 import geopandas as gpd
 import matplotlib.pyplot as plt
 
-from codebase.data.column_names import punt_travel_time_column, punt_detour_column, willingness_to_cycle_column, punt_buurt_code_column
-from codebase.buurt_calculations.buurt_calculations import willingness_to_cycle
-from codebase.data.codebook_dicts import transport_modes
-from codebase.data.filters import filter_by_time
-from codebase.data.load_buurt import load_buurt_data
+from codebase.data_manipulation.column_names import punt_travel_time_column
+from codebase.data_manipulation.codebook_dicts import transport_modes_dict
+from codebase.data_manipulation.filters import filter_by_time
+from codebase.data_loading.load_buurt import load_buurt_data
 
 def plot_willingness_by_buurt_heatmap(
         punt2, 
@@ -16,7 +15,7 @@ def plot_willingness_by_buurt_heatmap(
         show=True, 
         savename=None, 
         cmap='viridis', 
-        willingness_function=willingness_to_cycle,
+        willingness_function=None,
         multiply_by_population=False,
         transport_mode_str=None,
         pipeline=None,
@@ -24,6 +23,10 @@ def plot_willingness_by_buurt_heatmap(
         min_val=0,
         title_vehicle=None,
         ):
+    if willingness_function is None:
+        from codebase.buurt_calculations.willingness import willingness_to_cycle
+        willingness_function = willingness_to_cycle
+
     df_punt = load_buurt_data(punt2, mode=mode,)
     gdf = gpd.read_file("data/WijkBuurtkaart_2023_v2/wijkenbuurten_2023_v2.gpkg", layer="buurten")
     # Remove the empty buurts
@@ -49,6 +52,7 @@ def plot_willingness_by_buurt_heatmap(
     fig = plt.figure(figsize=(10, 10), frameon=False)
     gdf.plot(column=willingness_column_name, cmap=cmap, markersize=5, legend=True, vmin=min_val, vmax=max_val)
     title_vehicle = "cycle" if title_vehicle is None else title_vehicle
+    transport_mode_str = transport_modes_dict.get(mode, mode) if transport_mode_str is None else transport_mode_str
     plt.title(f"Heatmap of willingness to {transport_mode_str} to {punt2} in %")
     plt.axis("off")
     plt.tight_layout()
