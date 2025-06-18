@@ -57,13 +57,8 @@ def make_ml_dataset(
     X = pd.get_dummies(X, columns=categorical_cols_to_use, drop_first=True, dtype=np.int64)
     # Cast all non categorical columns to float
     X = X.astype({col: float for col in X.columns if col.split("_")[0] not in categorical_cols_to_use})
-    y: pd.DataFrame = df_[target_col].astype(np.int64)
-    
-    if target_vals is not None:
-        y_mask = df_[target_col].isin(target_vals)
-        y = y[y_mask]
-        X = X[y_mask]
-    
+    y: pd.DataFrame = df_[target_col].isin(target_vals) if target_vals is not None else df_[target_col]
+    y = y.astype(np.int64)
     if y_translation:
         y = y.map(y_translation).fillna(0).astype(np.int64)
     stratification = df_[stratification_col] if stratification_col else None
@@ -71,7 +66,7 @@ def make_ml_dataset(
     # Split the data into training and testing sets
     if group_col:
         gss = GroupShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)
-        train_idx, test_idx = next(gss.split(X, y, groups=X[group_col]))
+        train_idx, test_idx = next(gss.split(X, y, groups=df_[group_col]))
         X.drop(columns=[group_col], inplace=True, errors='ignore')
         X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
         y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
