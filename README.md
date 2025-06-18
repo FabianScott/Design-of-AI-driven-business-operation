@@ -10,7 +10,7 @@ The main recommendation for increasing the number of people willing to cycle to 
 
 For a simple introduction to using the tools in this repository, look at the following notebooks:
 - `Topic1/choropleths_and_willingness.ipynb` for how to create choropleths (geographical heatmaps) and calculate willingness to cycle
-- `Topic1/detour_analysis.ipynb` for extensive analysis for finding the places where most people are the most affected by detours
+- `Topic1/top_detour.ipynb` for extensive analysis for finding the places where most people are the most affected by detours
 - `Topic2/decision_tree_demo.ipynb` for an introduction to the dataloading for ml
 - `Topic2/*` for notebooks producing classification results
 - `Topic3/ebike_speeds` for the calculation of the impact of changing the legal maximum speed on potential ridership
